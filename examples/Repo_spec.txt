@@ -1,0 +1,13 @@
+//
+Genome CNB2
+Annotation CNB2_FINAL_CALLGENES_1
+//
+Genome Cryp_gatt_IND107_V2
+Annotation Cryp_gatt_IND107_V2_FINAL_CALLGENES_1
+//
+Genome Cryp_gatt_CA1280_V1
+Annotation Cryp_gatt_CA1280_V1_FINAL_CALLGENES_1
+//
+Genome CNB_WM276_v2
+Annotation CNB_WM276_v2_Final_CUSTOMCALLGENES_1
+//

@@ -1,0 +1,192 @@
+All documentation for SynIma is provided at the SynIma website:
+
+http://XXX.sourceforge.net
+
+SynIma (Synteny Imager) is a program for visualising syntenic regions from 
+orthologous genes, infered by reciprocal best hits (RBH) from BLAST, or 
+OrthoMCL, followed optionally by DAGchainer. OrthoMCL and DAGchainer are
+bundled with SynIma, and wrapper scripts are provided in /util/. A number 
+of the scripts launch several jobs that can be run on a grid (LSF, 
+GridEngine, UGER are supported).
+
+Prerequisites:
+--------------
+
+Perl
+Bio-Perl
+Python
+R
+Legacy-blast
+
+Getting started / example pipeline:
+-----------------------------------
+
+git clone https://github.com/XXX/SynIma.git
+cd SynIma/examples
+perl ../util/Create_full_repo_sequence_databases.pl -r ./Repo_spec.txt
+perl ../util/Blast_grid_all_vs_all.pl -r ./Repo_spec.txt
+perl ../util/Blast_all_vs_all_repo_to_OrthoMCL.pl -r ./Repo_spec.txt
+ALTERNATIVELY: ../util/Blast_all_vs_all_repo_to_RBH.pl -r ./Repo_spec.txt
+perl ../util/OrthoMCL_or_RBH_to_summary.pl -o all_orthomcl.out
+perl ../util/DAGchainer_from_gene_clusters.pl -r ./Repo_spec.txt \
+             -c GENE_CLUSTERS_SUMMARIES.OMCL/GENE_CLUSTERS_SUMMARIES.clusters
+perl ../SynIma.pl -a Repo_spec.txt.dagchainer.aligncoords \ 
+             -b Repo_spec.txt.dagchainer.aligncoords.spans
+
+Description of example pipeline:
+--------------------------------
+
+SynIma visualises aligncoords and aligncoords.spans files, which are tab 
+delimited text based coordinate files describing sub-genomic regions of 
+synteny between two or more genomes. Having cloned a local copy of all 
+the code using git clone, and navigated to the examples sub-folder, the 
+first step is to create a 'repo sequence database'. 
+Create_full_repo_sequence_databases.pl reads in a Repository specification 
+file (example Repo_spec file provided in examples) and outputs two fasta files 
+(Repo_spec.txt.all.cds and Repo_spec.txt.all.pep) which are merged from 
+each of the genome folders and used later.
+
+The Input Repo_spec files take the format of:
+
+//
+Genome CNB2
+Annotation CNB2_FINAL_CALLGENES_1
+//
+Genome Cryp_gatt_IND107_V2
+Annotation Cryp_gatt_IND107_V2_FINAL_CALLGENES_1
+//
+
+For each genome ID (E.g. CNB2) listed in the Repo_spec, a corresponding 
+sub-folder with the same name must be present in the same directory as the 
+Repo_spec. In each genome folder, a genome.fasta must be present, and named 
+[genome-id].genome.fa E.g. CNB2/CNB2.genome.fa. Additionally, Annotation 
+files are specified in the Data_repo, which should refer to the prefix of 
+3 additional files in each genome directory:
+
+[annotation-id].annotation.gff3
+[annotation-id].annotation.cds
+[annotation-id].annotation.pep
+
+The GFF should have gene or mRNA features, with identifiers that are also in the 
+.cds and .pep FASTA files, which contain the Complementarity-determining 
+region (cds) and peptide (pep) sequences respectively. GFF ID's can be listed as such:
+cgbd CNB_WM276_v2 mRNA 450360 453023 . + . ID=012346;Parent=012345;Name=actin
+or any other way that is specified explicitly for Blast_all_vs_all_repo_to_OrthoMCL/RBH.pl
+and DAGchainer_from_gene_clusters.pl. Gene ID's in the two FASTA files can be a simple
+word i.e. >CBBG_0001 or they can have multiple fields e.g.
+>01 gene_id=02 locus=03 name="ATPS" genome=Esch_coli analysisRun=Esch_coli_Augustus
+
+The second step is to run all vs all BLAST hits using Blast_grid_all_vs_all.pl.
+Peptide or nucleotide alignments are possible, although peptide is recomended.
+This step can take a long time, and therefore, the option of distributing jobs 
+to a cluster via LSF, SGE and UGE is provided (if available). This step will 
+create folders in each of the genome folders called RBH_blast_[PEP/CDS]. This 
+step requires BLAST legacy (formatdb and blastall) to be in $PATH.
+
+The third step is to run OrthoMCL or reciprocal best hits (RBH) on the BLAST output 
+using Blast_all_vs_all_repo_to_OrthoMCL.pl or Blast_all_vs_all_repo_to_RBH.pl 
+respectively. This will create an OMCL_outdir or RBH_outdir, containing 
+all_orthomcl.out or PEP.RBH.OrthoClusters. RBH will likely be less accurate than 
+OrthoMCL, but OrthoMCL has a limited number of genomes/genes that can be compared 
+due to memory constraints.
+
+The forth step is to summarise the OrthoMCL output (OMCL_outdir/all_orthomcl.out), 
+or RBH output (RBH_outdir/PEP.RBH.OrthoClusters) using OrthoMCL_or_RBH_to_summary.pl.
+This step will create ortholog predictions in the output folders 
+GENE_CLUSTERS_SUMMARIES.OMCL or GENE_CLUSTERS_SUMMARIES.RBH respectively.
+
+The fifth step is to run DAGChainer on the ortholog summary using 
+DAGchainer_from_gene_clusters.pl.
+
+The sixth and final step is to run SynIma.pl on the aligncoords and aligncoords.spans 
+output from DAGChainer.
+
+Individual script details:
+--------------------------
+
+SynIma and wrapper script parameters are shown below, followed by their default settings given in [].
+
+Create_full_repo_sequence_databases.pl 
+Parameters: -r ./Repo_spec.txt []
+
+Blast_grid_all_vs_all.pl
+Parameters: -r ./Repo_spec.txt []
+Optional:   -t Type of alignment. Can be either PEP (peptide) or CDS (Complementarity-determining region)
+            -c Number of best matches to capture between species [5]
+            -s Number of top hits to capture in self-searches for paralogs [1000]  
+            -e E-value cutoff [1e-20]
+            -o Blast cmds outfile [blast.$type.cmds]
+            -g Run commands on the grid (y/n) [n]
+            -p Platform (UGER, LSF, GridEngine) [UGER]
+            -q Queue name [short]
+Notes:      BLAST legacy tools formatdb and blastall are needed in $PATH
+
+Blast_all_vs_all_repo_to_OrthoMCL.pl 
+Parameters: -r ./Repo_spec.txt []
+Optional:   -t Type of alignment. Can be either PEP (peptide) or CDS (Complementarity-determining region) [PEP]
+            -o Out directory [OMCL_outdir]
+	    -f Feature wanted from GFF [mRNA]
+	    -s Seperator in GFF description for gene names (" ; etc) [;]
+	    -d GFF description part number with the parent/gene info [0]
+	    -m Remove additional comments in column [Parent=]
+Notes:      FASTA ID's and GFF ID's must match up to work - and must be standardised across each isolate. 
+            Use settings -f, -s, -d and -m to ensure they do
+
+Blast_all_vs_all_repo_to_RBH.pl
+Parameters: -r ./Repo_spec.txt
+Optional:   -t Type of alignment. Can be either PEP (peptide) or CDS (Complementarity-determining region) (PEP/CDS) [PEP]
+	    -o Out directory [RBH_outdir]
+	    -g Run commands on the grid (y/n) [n]
+	    -p Platform (UGER, LSF, GridEngine) [UGER]
+	    -q Queue name [short]
+
+OrthoMCL_or_RBH_to_summary.pl 
+Parameters: -o Ortholog file (E.g. PEP.RBH.OrthoClusters, all_orthomcl.out) []
+Optional:   -t Type of clustering (OMCL, RBH) [OMCL]
+            -d Outdir from Blast_all_vs_all_repo_to_OrthoMCL/RBH.pl [OMCL_outdir]
+	    -r Repo Spec [./Repo_spec.txt]
+            -p Repo Spec Peptide file [./Repo_spec.txt.all.pep]
+
+DAGchainer_from_gene_clusters.pl 
+Parameters: -r ./Repo_spec.txt []
+            -c Ortholog cluster data (E.g. ORTHOMCLBLASTFILE.clusters) []
+Optional:   -z File containing a list of genomes to restrict the analysis to []
+            -m Minimum number of paired genes in a single dagchain [4]
+            -o Cmds outdir [dagchainer_rundir]
+            -l Cmds outfile [cluster_cmds]
+            -g Run commands on the grid (y/n) [y]
+            -p Platform (UGER, LSF, GridEngine) [UGER]
+            -q Queue (hour, short, long) [short]
+	    -f Feature wanted from GFF [mRNA]
+	    -s Seperator in GFF description for gene names (\" ; etc) [;]
+	    -d GFF description part number with the parent/gene info [0]
+	    -m Remove additional comments in column [Parent=]
+Notes:      GFF specifications (-f, -s, -d, -m) need to be the same as specified during 
+            Blast_all_vs_all_repo_to_OrthoMCL.pl or Blast_all_vs_all_repo_to_RBH.pl";
+
+SynIma.pl
+Parameters: -c	./Config.txt []
+            -a	./Aligncoords []
+            -b	./Aligncoords.spans []
+Optional:   -e	Genome FASTA filename extension (e.g. ./SynIma/genome1/genome1.genome.fa etc.) [genome.fa]
+            -t	Aligncoords.spans 2 []
+	    -u	Aligncoords.spans 3 []
+	    -k	Gene IDs 1 (1 per line) []
+	    -l	Gene IDs 2 (1 per line) []
+	    -o	Gene IDs 3 (1 per line) []
+	    -r	Run full program (y) or just create config (n) [y]
+	    -v	Verbose output (y/n) [n]
+Plot Opts:  -i	Width of figure in pixels [1100]
+	    -j	Height of figure in pixels (num of genomes * 100)
+            -g	Fill in chromosome/contig synteny (c) or gene synteny (g) [c]
+	    -h	Fill in gene synteny (y = yes, n=none) [n]
+	    -z	Plot individual genes (y/n) [n]
+            -x	Order of genomes from bottom to top seperated by comma
+	    -n	Genome labels from bottom to top seperated by comma
+	    -w	number of lines for left hand margin [12]
+Notes:      Config.txt will be made automatically if not present, and read automatically if it is.
+            Config.txt specifies order of genomes, chromosomes, colours, and other plot options. 
+	    Config.txt can be manually edited after creation.
+	    Default genome labels will be as they appear in aligncoords
+	    Order of genomes must have names as they appear in aligncoords
+	    Aligncoords.spans and Gene ID files will be highlighted according to the config
