@@ -1,6 +1,6 @@
 All documentation for SynIma is provided at the SynIma website:
 
-http://XXX.sourceforge.net
+https://github.com/rhysf/Synima
 
 SynIma (Synteny Imager) is a program for visualising syntenic regions from 
 orthologous genes, infered by reciprocal best hits (RBH) from BLAST, or 
@@ -21,7 +21,7 @@ Legacy-blast
 Getting started / example pipeline:
 -----------------------------------
 
-git clone https://github.com/XXX/SynIma.git
+git clone git@github.com:rhysf/Synima.git
 cd SynIma/examples
 perl ../util/Create_full_repo_sequence_databases.pl -r ./Repo_spec.txt
 perl ../util/Blast_grid_all_vs_all.pl -r ./Repo_spec.txt
