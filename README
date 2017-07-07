@@ -22,7 +22,7 @@ Getting started / example pipeline:
 -----------------------------------
 
 git clone git@github.com:rhysf/Synima.git
-cd SynIma/examples
+cd Synima/examples
 perl ../util/Create_full_repo_sequence_databases.pl -r ./Repo_spec.txt
 perl ../util/Blast_grid_all_vs_all.pl -r ./Repo_spec.txt
 perl ../util/Blast_all_vs_all_repo_to_OrthoMCL.pl -r ./Repo_spec.txt
