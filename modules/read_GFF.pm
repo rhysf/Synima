@@ -54,7 +54,8 @@ sub combine_all_gff3_files_in_repo {
 		GFF: while (my $line=<$fh>) {
         		chomp $line;
 			next GFF if($line =~ m/^$/);
-        		my @cols = split "\t", $line;
+        		next GFF if($line =~ m/^#/);
+			my @cols = split "\t", $line;
         		$cols[1] = $genome;
         		my $new_line = join "\t", @cols;
             		print $ofh "$new_line\n" ;
@@ -76,6 +77,7 @@ sub save_genome_codes_from_gff3 {
 	GFF: while (my $line=<$fh>) {
 		chomp $line;
         	next GFF unless ($line =~/\w/);
+        	next GFF if($line =~ m/^#/);
         	my @x = split /\t/, $line;
 		my ($genome, $type, $gene_info) = ($x[1], $x[2], $x[8]);
 		next GFF unless ($type eq $feature);
