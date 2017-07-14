@@ -394,6 +394,7 @@ sub parse_omcl_clusters {
 		next unless ($line =~/\w/);
 		my @x = split /\t/, $line;
 		my ($cluster_id, $genome_name, $analysisRunName, $trans_id, $gene_id, $locus, $com_name) = @x;
+		next if(!defined $gene_id);
 		$gene_to_omcl{$gene_id} = $cluster_id;
 		$omcl_to_genome_gene{$cluster_id}{$genome_name}{$gene_id} = 1;
 	}
@@ -407,6 +408,7 @@ sub parse_annot {
 	warn "Saving info from $annot_file...\n";
 	open (my $fh, $annot_file);
 	while (my $line=<$fh>) {
+		next if($line =~ m/^#/);
 		next unless ($line =~ m/\w/); 
 		my @x = split /\t/, $line;
 		my ($scaff, $source, $type, $lend, $rend, $x1, $orient, $x2, $info) = @x;
@@ -414,9 +416,9 @@ sub parse_annot {
 
 		# Save gene id, Name and alias from GFF3
 		my ($gene_id)  = ( $info =~ /ID=([\w\W]+?)[;\n]/ );
-		die "Error, cannot parse ID info from $info:\n$line\n" if(!defined $gene_id);
+		die "Cannot parse ID info from $info:\n$line\n" if(!defined $gene_id);
 		my ($name) = ( $info =~ /Name=([\w\W]+?)[;\n]/ );
-		die "Error, cannot parse name info from $info $name:\n$line\n" if(!defined $name);
+		die "Cannot parse name info from $info on $line\n" if(!defined $name);
 		my ($alias) = ( $info =~ /Alias=([\w\W]+?)[;\n]/ );
 		my $locus;
 		if (defined $alias) {	
