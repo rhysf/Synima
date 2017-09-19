@@ -112,7 +112,13 @@ sub retrieve_hits {
 	my ($file, $output) = @_;
 	open my $fh, '<', $file or die "Error, cannot open file $file : $!\n";
 	open my $ofh, '>>', $output or die "Error, cannot open file $output : $!\n";
-	while (<$fh>) { print $ofh $_; }
+	while(my $line=<$fh>) {
+		# Error check
+		my @bits = split /\t/, $line;
+		die "$file is incomplete/corrupted for line consisting of: $line\nRemake file or delete line.\n" if(scalar(@bits) ne 12);
+		# Print
+		print $ofh $line;
+	}
 	close $fh;
 	close $ofh;
 	return;

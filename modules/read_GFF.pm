@@ -89,7 +89,7 @@ sub save_genome_codes_from_gff3 {
 			my $trans_id;
         		if ($gene_info =~ /ID=([^;]+)/) {
         			$trans_id = $1;
-				$trans_id_to_genome{$trans_id}= $genome;
+				$trans_id_to_genome{$trans_id} = $genome;
 			} else { die "Error, cannot find trans_id from $line\n"; }
 
 			my $alias_id;
