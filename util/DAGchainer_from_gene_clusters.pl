@@ -24,7 +24,7 @@ Optional: -z File containing a list of genomes to restrict the analysis to []
 	  -d GFF description part number with the parent/gene info [0]
 	  -m Remove additional comments in column [Parent=]
 Notes:    GFF specifications (-f, -s, -d, -m) need to be the same as specified during 
-          Blast_all_vs_all_repo_to_OrthoMCL.pl or Blast_all_vs_all_repo_to_RBH.pl";
+          Blast_all_vs_all_repo_to_OrthoMCL.pl or Blast_all_vs_all_repo_to_RBH.pl\n";
 our($opt_r, $opt_c, $opt_z, $opt_i, $opt_o, $opt_l, $opt_g, $opt_p, $opt_q, $opt_f, $opt_s, $opt_d, $opt_m);
 getopt('rczmolgpqfsdm');
 die $usage unless ($opt_r && $opt_c);

@@ -136,10 +136,12 @@ sub save_gene_struct_from_gff {
 		my ($end5, $end3) = ($orient eq '+') ? ($lend, $rend) : ($rend, $lend);
 
 		#next unless ($feat_type =~ /gene|mrna/i);
-		next GFF unless ($type eq $feature);
+		#next GFF unless ($type eq $feature);
+		next GFF unless (($type eq $feature) || (($type eq 'gene') && (($gene_info =~ m/ID=([^;]+)/) && ($gene_info =~ /Alias=([^;]+)/))));
 
 		# Broad Style:
-		if(($gene_info =~ m/ID=([^;]+)/) && ($gene_info =~ /Alias=([^;]+)/) && ($gene_info =~ /Parent=([^;]+)/)) {
+		#if(($gene_info =~ m/ID=([^;]+)/) && ($gene_info =~ /Alias=([^;]+)/) && ($gene_info =~ /Parent=([^;]+)/)) {
+		if(($gene_info =~ m/ID=([^;]+)/) && ($gene_info =~ /Alias=([^;]+)/)) {
 
 			# Include org in the gene identifier name:
 			$gene_info =~ /ID=([^;\s]+)/;
