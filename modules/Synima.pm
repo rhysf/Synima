@@ -65,6 +65,16 @@ sub write_config {
 	# Save genome names, genome lengths, contig lengths, num of genomes, half way point and longest genome (xmax)
 	my ($genome_names, $genome_lengths, $genome_contig_lengths, $num_genomes, $half_way_point_through_genomes, $xmax, $genome_contig_order) = &gather_genome_lengths_for_config($aligncoords_spans1, $genome_extensions, $verbose);
 
+	# Genome order
+	if($order_of_genomes eq 'n') { $order_of_genomes = $genome_names; }
+	else {
+		my @genome_name_split = split /,/, $order_of_genomes;
+		foreach my $genome_name(@genome_name_split) {
+			die "$genome_name specified as -x is not found in $aligncoords_spans1 ($genome_names)\n" if($genome_names !~ m/$genome_name/);
+		}
+		$genome_names = $order_of_genomes;
+	}
+
 	# Genome labels
 	if($genome_labels eq '') { $genome_labels = $genome_names; }
 	my @genome_labels_split = split /,/, $genome_labels;

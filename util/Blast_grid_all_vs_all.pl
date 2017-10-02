@@ -31,6 +31,7 @@ if(!defined $opt_o) { $opt_o = "blast.$opt_t.cmds"; }
 if(!defined $opt_g) { $opt_g = 'n'; }
 if(!defined $opt_p) { $opt_p = 'UGER'; }
 if(!defined $opt_q) { $opt_q = 'short'; }
+die "Cannot open $opt_r : $!\n" unless(-e $opt_r);
 die "-g is not n, N, y or Y: $opt_g\n" if($opt_g !~ m/^(n|N|y|Y)$/);
 die "-t is not PEP or CDS: $opt_t\n" if($opt_t !~ m/^(PEP|CDS)$/);
 die "-p is not UGER, LSF or GridEngine: $opt_p\n" if($opt_p !~ m/^(UGER|LSF|GridEngine)$/);
