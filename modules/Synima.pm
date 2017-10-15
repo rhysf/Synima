@@ -39,6 +39,9 @@ sub write_config {
 	my $left_margin         = $params[15]; # w
 	my $order_of_genomes    = $params[16]; # x
 	my $plot_ind_genes      = $params[17]; # z
+	if($verbose eq 'y') { 
+		warn "write_congig: -a $aligncoords -b $aligncoords_spans1 -c $config_file -e $genome_extensions -g $plot_contig_synteny -i $width_pixels -j $height_pixels -k $gene_list1 -l $gene_list2 -n $genome_labels -o $gene_list3 -r $run_synima -t $aligncoords_spans2 -u $aligncoords_spans3 -v $verbose -w $left_margin -x $order_of_genomes -z $plot_ind_genes\n"; 
+	}
 
 	# Check input files can be read
 	foreach($aligncoords, $aligncoords_spans1) { die "Cannot open file: $_ : $!\n" if(! -e $_); }
@@ -70,7 +73,7 @@ sub write_config {
 	else {
 		my @genome_name_split = split /,/, $order_of_genomes;
 		foreach my $genome_name(@genome_name_split) {
-			die "$genome_name specified as -x is not found in $aligncoords_spans1 ($genome_names)\n" if($genome_names !~ m/$genome_name/);
+			die "$genome_name specified in -x is not found in $aligncoords_spans1 ($genome_names)\n" if($genome_names !~ m/$genome_name/);
 		}
 		$genome_names = $order_of_genomes;
 	}

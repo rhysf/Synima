@@ -32,7 +32,6 @@ Optional:  -e\tGenome FASTA filename extension (e.g. $cwd/genome1/genome1.genome
 Plot Opts: -i\tWidth of figure in pixels [1100]
 	   -j\tHeight of figure in pixels (num of genomes * 100)
            -g\tFill in chromosome/contig synteny (c) or gene synteny (g) [c]
-	   -h\tFill in gene synteny (y = yes, n=none) [n]
 	   -z\tPlot individual genes (y/n) [n]
            -x\tOrder of genomes from bottom to top seperated by comma
 	   -n\tGenome labels from bottom to top seperated by comma
@@ -43,8 +42,8 @@ Notes:     Config.txt will be made automatically if not present, and read automa
 	   Default genome labels will be as they appear in aligncoords
 	   Order of genomes must have names as they appear in aligncoords
 	   Aligncoords.spans and Gene ID files will be highlighted according to the config\n";
-our($opt_a, $opt_b, $opt_c, $opt_e, $opt_g, $opt_i, $opt_j, $opt_k, $opt_l, $opt_n, $opt_o, $opt_r, $opt_t, $opt_u, $opt_v, $opt_w, $opt_x, $opt_z);
-getopt('abcegijklnortuvwxz');
+our($opt_a, $opt_b, $opt_c, $opt_d, $opt_e, $opt_f, $opt_g, $opt_h, $opt_i, $opt_j, $opt_k, $opt_l, $opt_m, $opt_n, $opt_o, $opt_p, $opt_q, $opt_r, $opt_s, $opt_t, $opt_u, $opt_v, $opt_w, $opt_x, $opt_y, $opt_z);
+getopt('abcdefghijklmnopqrstuvwxyz');
 die $usage unless (($opt_c) || ($opt_a && $opt_b));
 foreach($opt_a, $opt_b, $opt_k, $opt_l, $opt_n, $opt_o, $opt_t, $opt_u) { if(!defined $_) { $_ = ''; } }
 if(!defined $opt_c) { $opt_c = "$cwd/SynIma-output/config.txt"; }
@@ -83,6 +82,7 @@ for(my $i=1; $i<=3; $i++) {
 my $order = synima::make_array_from_config_line($synima_data, 'genome_order');
 my $ylab = synima::make_array_from_config_line($synima_data, 'genome_labels');
 die "Different number of genomes in genome_order and genome_labels. Remake or edit $opt_c\n" if(scalar(@{$order}) ne scalar(@{$ylab}));
+#die "Different number of genomes in aligncoords_spans_location1 ($num_genomes_saved_in_aligncoords1) than specified in order or ylab\n" if($num_genomes_saved_in_aligncoords1 ne (scalar(@{$order})));
 my ($running_genome_length);
 foreach my $genome_id(@{$order}) { $$running_genome_length{$genome_id} = 0; }
 
