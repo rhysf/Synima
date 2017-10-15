@@ -23,10 +23,11 @@ Optional: -z File containing a list of genomes to restrict the analysis to []
 	  -s Seperator in GFF description for gene names (\" ; etc) [;]
 	  -d GFF description part number with the parent/gene info [0]
 	  -m Remove additional comments in column [Parent=]
+	  -v Verbose (y/n) [n]
 Notes:    GFF specifications (-f, -s, -d, -m) need to be the same as specified during 
           Blast_all_vs_all_repo_to_OrthoMCL.pl or Blast_all_vs_all_repo_to_RBH.pl\n";
-our($opt_r, $opt_c, $opt_z, $opt_i, $opt_o, $opt_l, $opt_g, $opt_p, $opt_q, $opt_f, $opt_s, $opt_d, $opt_m);
-getopt('rczmolgpqfsdm');
+our($opt_a, $opt_b, $opt_c, $opt_d, $opt_e, $opt_f, $opt_g, $opt_h, $opt_i, $opt_j, $opt_k, $opt_l, $opt_m, $opt_n, $opt_o, $opt_p, $opt_q, $opt_r, $opt_s, $opt_t, $opt_u, $opt_v, $opt_w, $opt_x, $opt_y, $opt_z);
+getopt('abcdefghijklmnopqrstuvwxyz');
 die $usage unless ($opt_r && $opt_c);
 foreach($opt_r, $opt_c) { die "Cannot find $_\n" unless(-e $_); }
 if(!defined $opt_z) { $opt_z = ''; }
@@ -40,6 +41,7 @@ if(!defined $opt_f) { $opt_f = 'mRNA'; }
 if(!defined $opt_s) { $opt_s = ';'; }
 if(!defined $opt_d) { $opt_d = 0; }
 if(!defined $opt_m) { $opt_m = 'Parent='; }
+if(!defined $opt_v) { $opt_v = 'n'; }
 die "-d needs to be a number: $opt_d\n" unless($opt_d =~ m/^\d+$/);
 
 # Out directory
@@ -60,8 +62,8 @@ my ($orthocluster_to_genes, $genomes_parsed) = &save_gene_ids_from_ortholog_file
 # Process orthocluster results into hit pairs.
 my $genome_pair_to_gene_pairs = &process_orthocluster_results_into_hit_pairs($orthocluster_to_genes);
 
-# Make dagchainer config file
-my $dag_cmds = "-f $opt_f -d $opt_d -m $opt_m -s $opt_s";
+# Make dagchainer config file (finish with opt_s that might be ;)
+my $dag_cmds = "-f $opt_f -d $opt_d -m $opt_m -v $opt_v -s $opt_s";
 my @dagchainer_cmds = &write_dagchainer_conf_file($opt_o, $data_manager, $genomes_parsed, $genome_pair_to_gene_pairs, $dag_cmds);
 
 # Write cmd list
