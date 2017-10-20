@@ -32,7 +32,8 @@ die "-t is not PEP or CDS: $opt_t\n" if($opt_t !~ m/^(PEP|CDS)$/);
 die "-p is not UGER, LSF or GridEngine: $opt_p\n" if($opt_p !~ m/^(UGER|LSF|GridEngine)$/);
 
 # Dependencies
-my $slclust = "$Bin/support_scripts/slclust";
+my $uname = $ENV{HOSTTYPE};
+my $slclust = "$Bin/support_scripts/slclust.$uname";
 foreach($slclust) { die "Cannot find $_ : $!\n" unless(-e $_); }
 
 # Write RBH files

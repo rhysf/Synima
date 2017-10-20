@@ -70,18 +70,20 @@ our @EXPORT = qw(
 );
 
 
-# softwares
+# Software
 our $BLASTALL                            = "blastall";
 our $BLAST_FORMAT                        = "compact";  # "compact" corresponds to NCBI-BLAST's -m 8
                                                        # "full" corresponds to NCBI-BLAST's -m 0
                                                        # for WU-BLAST, make changes on subroutine executeBLASTALL
 our $BLAST_NOCPU                         = 1;          # Useful when running BLAST on multi-processor machine
 our $FORMATDB                            = "formatdb";
-our $MCL                                 = "$Bin/mcl";
+
+my $uname = $ENV{HOSTTYPE};
+our $MCL                                 = "$Bin/mcl.$uname";
 
 # path
 our $PATH_TO_ORTHOMCL                    = "./";   # must end with "/" 
-our $ORTHOMCL_DATA_DIR                   = $PATH_TO_ORTHOMCL."/sample_data/";
+our $ORTHOMCL_DATA_DIR                   = $PATH_TO_ORTHOMCL . "/sample_data/";
 our $ORTHOMCL_WORKING_DIR                = '';                            # will be changed with each run
 our $ORTHOMCL_FORMER_RUN_DIR             = '';                            # if and only if user wants to use former run data
 our $ORTHOMCL_TMP_DIR                    = '';                            # will be changed with each run
