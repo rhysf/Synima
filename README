@@ -23,6 +23,14 @@ Getting started / example pipeline:
 
 git clone git@github.com:rhysf/Synima.git
 cd Synima/examples
+perl ../SynIma.pl -a Repo_spec.txt.dagchainer.aligncoords \ 
+             -b Repo_spec.txt.dagchainer.aligncoords.spans
+
+Full example pipeline
+---------------------
+
+git clone git@github.com:rhysf/Synima.git
+cd Synima/examples
 perl ../util/Create_full_repo_sequence_databases.pl -r ./Repo_spec.txt
 perl ../util/Blast_grid_all_vs_all.pl -r ./Repo_spec.txt
 perl ../util/Blast_all_vs_all_repo_to_OrthoMCL.pl -r ./Repo_spec.txt
@@ -111,7 +119,7 @@ Parameters: -r ./Repo_spec.txt []
 
 Blast_grid_all_vs_all.pl
 Parameters: -r ./Repo_spec.txt []
-Optional:   -t Type of alignment. Can be either PEP (peptide) or CDS (Complementarity-determining region)
+Optional:   -t Type of alignment. Can be either PEP (peptide) or CDS (Complementarity-determining region) [PEP]
             -c Number of best matches to capture between species [5]
             -s Number of top hits to capture in self-searches for paralogs [1000]  
             -e E-value cutoff [1e-20]
@@ -151,21 +159,22 @@ DAGchainer_from_gene_clusters.pl
 Parameters: -r ./Repo_spec.txt []
             -c Ortholog cluster data (E.g. ORTHOMCLBLASTFILE.clusters) []
 Optional:   -z File containing a list of genomes to restrict the analysis to []
-            -m Minimum number of paired genes in a single dagchain [4]
+            -i Minimum number of paired genes in a single dagchain [4]
             -o Cmds outdir [dagchainer_rundir]
             -l Cmds outfile [cluster_cmds]
-            -g Run commands on the grid (y/n) [y]
+            -g Run commands on the grid (y/n) [n]
             -p Platform (UGER, LSF, GridEngine) [UGER]
             -q Queue (hour, short, long) [short]
 	    -f Feature wanted from GFF [mRNA]
 	    -s Seperator in GFF description for gene names (\" ; etc) [;]
 	    -d GFF description part number with the parent/gene info [0]
 	    -m Remove additional comments in column [Parent=]
+	    -v Verbose (y/n) [n]
 Notes:      GFF specifications (-f, -s, -d, -m) need to be the same as specified during 
             Blast_all_vs_all_repo_to_OrthoMCL.pl or Blast_all_vs_all_repo_to_RBH.pl";
 
 SynIma.pl
-Parameters: -c	./Config.txt []
+Parameters: -c	./Config.txt [$cwd/SynIma-output/config.txt]
             -a	./Aligncoords []
             -b	./Aligncoords.spans []
 Optional:   -e	Genome FASTA filename extension (e.g. ./SynIma/genome1/genome1.genome.fa etc.) [genome.fa]
@@ -179,7 +188,6 @@ Optional:   -e	Genome FASTA filename extension (e.g. ./SynIma/genome1/genome1.ge
 Plot Opts:  -i	Width of figure in pixels [1100]
 	    -j	Height of figure in pixels (num of genomes * 100)
             -g	Fill in chromosome/contig synteny (c) or gene synteny (g) [c]
-	    -h	Fill in gene synteny (y = yes, n=none) [n]
 	    -z	Plot individual genes (y/n) [n]
             -x	Order of genomes from bottom to top seperated by comma
 	    -n	Genome labels from bottom to top seperated by comma
