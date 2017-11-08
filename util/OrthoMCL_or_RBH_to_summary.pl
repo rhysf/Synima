@@ -18,16 +18,18 @@ my $usage = "Usage: perl $0 -o <ortholog file (E.g. PEP.RBH.OrthoClusters, all_o
 Optional -t Type of clustering (OMCL, RBH) [OMCL]
          -d Outdir from Blast_all_vs_all_repo_to_OrthoMCL/RBH.pl [OMCL_outdir]
 	 -r Repo Spec [./Repo_spec.txt]
-	 -p Repo Spec Peptide file [./Repo_spec.txt.all.pep]\n";
+	 -p Repo Spec Peptide file [./Repo_spec.txt.all.PEP]\n";
 our($opt_t, $opt_d, $opt_r, $opt_p, $opt_o);
 getopt('tdrpo');
 if(!defined $opt_t) { $opt_t = 'OMCL'; }
 if(!defined $opt_d) { $opt_d = 'OMCL_outdir'; }
 if(!defined $opt_r) { $opt_r = './Repo_spec.txt'; }
-if(!defined $opt_p) { $opt_p = './Repo_spec.txt.all.pep'; }
+if(!defined $opt_p) { $opt_p = './Repo_spec.txt.all.PEP'; }
 die $usage unless($opt_o);
 die "$opt_o not recognised as a file\n" if(! -f $opt_o);
 die "-t not equal to OMCL or RBH: $opt_t\n" unless(($opt_t eq 'OMCL') || ($opt_t eq 'RBH'));
+
+# Get genome codes from OMCL folder (if OMCL)
 my $genome_codes;
 if($opt_t eq 'OMCL') { 
 	die "Cannot find outdir $opt_d : $!\n" unless(-d $opt_d);

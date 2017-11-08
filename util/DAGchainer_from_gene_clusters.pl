@@ -7,6 +7,7 @@ use lib "$Bin/../modules/";
 use DataSpecFileParser;
 use File::Basename;
 use Synima;
+use read_GFF;
 
 ### rfarrer@broadinstitute.org
 
@@ -19,13 +20,7 @@ Optional: -z File containing a list of genomes to restrict the analysis to []
 	  -g Run commands on the grid (y/n) [n]
 	  -p Platform (UGER, LSF, GridEngine) [UGER]
 	  -q Queue (hour, short, long) [short]
-	  -f Feature wanted from GFF [mRNA]
-	  -s Seperator in GFF description for gene names (\" ; etc) [;]
-	  -d GFF description part number with the parent/gene info [0]
-	  -m Remove additional comments in column [Parent=]
-	  -v Verbose (y/n) [n]
-Notes:    GFF specifications (-f, -s, -d, -m) need to be the same as specified during 
-          Blast_all_vs_all_repo_to_OrthoMCL.pl or Blast_all_vs_all_repo_to_RBH.pl\n";
+	  -v Verbose (y/n) [n]\n";
 our($opt_a, $opt_b, $opt_c, $opt_d, $opt_e, $opt_f, $opt_g, $opt_h, $opt_i, $opt_j, $opt_k, $opt_l, $opt_m, $opt_n, $opt_o, $opt_p, $opt_q, $opt_r, $opt_s, $opt_t, $opt_u, $opt_v, $opt_w, $opt_x, $opt_y, $opt_z);
 getopt('abcdefghijklmnopqrstuvwxyz');
 die $usage unless ($opt_r && $opt_c);
@@ -37,12 +32,7 @@ if(!defined $opt_l) { $opt_l = 'cluster_cmds'; }
 if(!defined $opt_g) { $opt_g = 'n'; }
 if(!defined $opt_p) { $opt_p = 'UGER'; }
 if(!defined $opt_q) { $opt_q = 'short'; }
-if(!defined $opt_f) { $opt_f = 'mRNA'; }
-if(!defined $opt_s) { $opt_s = ';'; }
-if(!defined $opt_d) { $opt_d = 0; }
-if(!defined $opt_m) { $opt_m = 'Parent='; }
 if(!defined $opt_v) { $opt_v = 'n'; }
-die "-d needs to be a number: $opt_d\n" unless($opt_d =~ m/^\d+$/);
 
 # Out directory
 unless (-d $opt_o) { system("mkdir $opt_o"); }
@@ -62,8 +52,12 @@ my ($orthocluster_to_genes, $genomes_parsed) = &save_gene_ids_from_ortholog_file
 # Process orthocluster results into hit pairs.
 my $genome_pair_to_gene_pairs = &process_orthocluster_results_into_hit_pairs($orthocluster_to_genes);
 
-# Make dagchainer config file (finish with opt_s that might be ;)
-my $dag_cmds = "-f $opt_f -d $opt_d -m $opt_m -v $opt_v -s $opt_s";
+# Split GFF by genome
+my $GFF_repo_dictionary = "$opt_r.all.GFF3";
+gfffile::split_gff_dictionary_by_species($GFF_repo_dictionary, $opt_r);
+
+# Make dagchainer config file
+my $dag_cmds = "-v $opt_v";
 my @dagchainer_cmds = &write_dagchainer_conf_file($opt_o, $data_manager, $genomes_parsed, $genome_pair_to_gene_pairs, $dag_cmds);
 
 # Write cmd list
@@ -131,8 +125,8 @@ sub save_gene_ids_from_ortholog_file {
 		next CLUSTER if((%{$restrict}) && (!exists $$restrict{$genome_id}));
 		next CLUSTER unless ($$include{$genome_id});
 
-		# Save these
-		push (@{$orthocluster_to_genes{$cluster_id}}, { genome => $genome_id, gene_id => "$genome_id:$gene_id"});
+		# Save transcript ids (previously gene_id)
+		push (@{$orthocluster_to_genes{$cluster_id}}, { genome => $genome_id, trans_id => "$genome_id:$trans_id"});
 		$genomes_parsed{$genome_id}++;
 	}
 	close $fh;
@@ -158,6 +152,7 @@ sub write_dagchainer_conf_file {
 			my $genome_seq_section_text = "";
 			foreach my $genome ($genome_i, $genome_j) {
 				my $annotation_file = $data_manager->get_data_dump_filename($genome, "Annotation");
+				$annotation_file .= ".synima-parsed.GFF3";
 				my $genome_seq_file = $data_manager->get_data_dump_filename($genome, "Genome");
 				$annot_section_text .= "$genome = $annotation_file\n";
 				$genome_seq_section_text .= "$genome = $genome_seq_file\n";
@@ -203,8 +198,9 @@ sub process_orthocluster_results_into_hit_pairs {
 
 				my $genome_A = $pair[0]->{genome};
 				my $genome_B = $pair[1]->{genome};
-				my $gene_id_A = $pair[0]->{gene_id};
-				my $gene_id_B = $pair[1]->{gene_id};
+				my $gene_id_A = $pair[0]->{trans_id};
+				my $gene_id_B = $pair[1]->{trans_id};
+				die "trans_id not saved from clusters. Rerun OrthoMCL_or_RBH_to_summary.pl\n" if((!defined $gene_id_A) || (!defined $gene_id_B));
 				push (@{$genome_pair_to_gene_pairs{$genome_A}->{$genome_B}}, [$gene_id_A, $gene_id_B]);
 			}
 		}

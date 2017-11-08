@@ -14,32 +14,22 @@ $|=1;
 # Opening commands
 my $usage = "Usage: perl $0 -c <Config file>
 Optional: -z Only write DAGchainer format for inputs (y/n) [n]
-	  -f Feature wanted from GFF [mRNA]
-	  -s Seperator in GFF description for gene names (\" ; etc) [;]
-	  -d GFF description part number with the parent/gene info [0]
-	  -m Remove additional comments in column [Parent=]
-	  -v Verbose (y/n) [n]
-Notes:    FASTA ID's and GFF ID's must match up 
-          Use settings -f, -s, -d and -m to ensure they do\n";
-our($opt_c, $opt_d, $opt_f, $opt_m, $opt_s, $opt_v, $opt_z);
-getopt('cdfmsvz');
+	  -v Verbose (y/n) [n]\n";
+our($opt_c, $opt_v, $opt_z);
+getopt('cvz');
 die $usage unless($opt_c);
-if(!defined $opt_d) { $opt_d = 0; }
-if(!defined $opt_f) { $opt_f = 'mRNA'; }
-if(!defined $opt_m) { $opt_m = 'Parent='; }
-if(!defined $opt_s) { $opt_s = ';'; }
 if(!defined $opt_v) { $opt_v = 'n'; }
 if(!defined $opt_z) { $opt_z = 'n'; }
-die "-d needs to be a number: $opt_d\n" unless($opt_d =~ m/^\d+$/);
+warn "Running $0 -c $opt_c -z $opt_z -v $opt_v\n";
 
 # Init
 my $DEBUG = 0;
-my $uname = $ENV{HOSTTYPE};
+my $uname = `uname`;
+chomp $uname;
 my $progpath = "$FindBin::Bin/";
-warn "Program path: $0\n";
-warn "Settings: -c $opt_c -z $opt_z -f $opt_f -s $opt_s -d $opt_d -m $opt_m -v $opt_v\n";
 
 # Save dagchainer config file
+warn "Saving dagchainer config $opt_c...\n";
 my ($dag_config, $organism_to_gff_file) = &save_dagchainer_config($opt_c);
 
 # hidden opt for troubleshooting.
@@ -53,28 +43,28 @@ main: {
 	my $orthologs;
 	if ($$dag_config{'orthologs_file'}) { $orthologs = &parse_orthologs($$dag_config{'orthologs_file'}); }
 	
-	if($opt_v eq 'y') { warn "-parsing matches file: $$dag_config{'inputFile'}\n"; }
+	if($opt_v eq 'y') { warn "Parsing matches file: $$dag_config{'inputFile'}...\n"; }
 	my @match_pairs = &parse_matches_file($$dag_config{'inputFile'}, $orthologs, $$dag_config{'max_e_value'});
 	
-	if($opt_v eq 'y') { warn "-parsing gene features...\n"; }
-	my @gene_features = &parse_gff_files($organism_to_gff_file, $opt_f, $opt_s, $opt_d, $opt_m);
+	if($opt_v eq 'y') { warn "Saving gene features...\n"; }
+	my @gene_features = &parse_gff_files($organism_to_gff_file);
 
 	# Assign lookup of feature based on gene_id, mRNA_id, and alias if available.
-	if($opt_v eq 'y') { warn "-linking feature IDs to genes\n"; }
+	if($opt_v eq 'y') { warn "Linking feature IDs to genes...\n"; }
 	my $feature_ID_to_gene = &link_feature_IDs_to_gene(@gene_features);
 	
 	# Order genes on scaffold and set relative position values.
-	if($opt_v eq 'y') { warn "-ordering genes on scaffolds\n"; }
+	if($opt_v eq 'y') { warn "Ordering genes on scaffolds...\n"; }
 	my %orgMol_to_geneList = &splay_genes_on_molecule(@gene_features);
 
 	# Get matches of gene pairs according to molecule comparisons.
 	# Molecules and matches are sorted lexically
 	# OrgMolPair is a tab-delimited key of orgMolA(tab)orgMolB
-	if($opt_v eq 'y') { warn "-grouping matches by organism/molecule pairs\n"; }
+	if($opt_v eq 'y') { warn "Grouping matches by organism/molecule pairs...\n"; }
 	my %orgMolPair_to_matches = &group_matches_by_orgMolPairs(\@match_pairs, $feature_ID_to_gene);
 
 	if ($$dag_config{'NOISE_FILTER_DIST'}) {
-		if($opt_v eq 'y') { warn "-applying noise filter\n"; }
+		if($opt_v eq 'y') { warn "Applying noise filter...\n"; }
 		%orgMolPair_to_matches = &apply_noise_filter(\%orgMolPair_to_matches, $feature_ID_to_gene, $$dag_config{'NOISE_FILTER_DIST'}, $$dag_config{'operation_mode'});
 	}
 
@@ -371,13 +361,13 @@ sub scoringF {
 }
 
 sub parse_gff_files {
-	my ($org_to_gff, $f, $s, $d, $m) = @_;
+	my ($org_to_gff) = $_[0];
 	
 	my %genes;
 	# assume read gene line before transcript line
 	foreach my $organism (keys %{$org_to_gff}) {
 		my $gff_file = $$org_to_gff{$organism};
-		my $gene_for_org = gfffile::save_gene_struct_from_gff($gff_file, $organism, $f, $s, $d, $m);
+		my $gene_for_org = gfffile::save_gene_struct_from_gff($gff_file, $organism);
 		%genes = (%genes, %{$gene_for_org});
 		#die "have i saved the right stuff?";
 	}
@@ -444,8 +434,8 @@ sub group_matches_by_orgMolPairs {
 
 		my $gene_struct_A = $feature_ID_to_gene_href->{$accA};
 		my $gene_struct_B = $feature_ID_to_gene_href->{$accB};
-		confess "Warning, cannot find a gene feature for [$accA]\n" unless ($gene_struct_A);
-		confess "Warning, cannot find a gene feature for [$accB]\n" unless ($gene_struct_B);
+		confess "Warning, cannot find a gene feature for [$accA] from dagchainer_rundir hit_pairs and GFF\n" unless ($gene_struct_A);
+		confess "Warning, cannot find a gene feature for [$accB] from dagchainer_rundir hit_pairs and GFF\n" unless ($gene_struct_B);
 
 		# Matches between two different isoforms of the same gene?  isoform self hits were already excluded on parsing.
 		next if ($gene_struct_A eq $gene_struct_B);
@@ -590,6 +580,7 @@ sub filter_matches {
 
 sub save_dagchainer_config {
 	my $conf = $_[0];
+	die "Cannot find $conf. Rerun DAGchainer_from_gene_cluster.pl\n" if(! -e $conf);
 
 	my %config;
 	my $properties_obj = new IniReader($conf);

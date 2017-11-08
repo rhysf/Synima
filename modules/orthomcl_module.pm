@@ -78,7 +78,10 @@ our $BLAST_FORMAT                        = "compact";  # "compact" corresponds t
 our $BLAST_NOCPU                         = 1;          # Useful when running BLAST on multi-processor machine
 our $FORMATDB                            = "formatdb";
 
-my $uname = $ENV{HOSTTYPE};
+#my $uname = $ENV{HOSTTYPE};
+my $uname = `uname`;
+chomp $uname;
+warn "Using $uname : $Bin/mcl.$uname\n";
 our $MCL                                 = "$Bin/mcl.$uname";
 
 # path

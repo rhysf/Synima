@@ -5,6 +5,7 @@ use Getopt::Std;
 use FindBin qw($Bin);
 use lib "$Bin/../modules/";
 use read_Blast;
+use read_FASTA;
 use Synima;
 
 ### rfarrer@broadinstitute.org
@@ -40,14 +41,17 @@ die "-p is not UGER, LSF or GridEngine: $opt_p\n" if($opt_p !~ m/^(UGER|LSF|Grid
 my $Run_Commands_python = "$Bin/support_scripts/Run_cmds_on_grid.py";
 foreach($Run_Commands_python) { die "Cannot find $_ : $!\n" unless(-e $_); }
 
+# Split FASTA seq dictionarys
+fastafile::split_fasta_seq_dictionary_by_species($opt_r, $opt_t);
+
 # Make commands for all-vs-all-search
 my @blast_cmds = blastfile::make_all_vs_all_blast_search_cmds_from_repo($opt_r, $opt_t, $opt_c, $opt_s, $opt_e, $opt_o);
 
 # Run commands on grid
-if(($opt_g =~ m/y|Y/) && (-s $opt_o)) {
+if(($opt_g =~ m/y/i) && (-s $opt_o)) {
 	my $cmd = "$Run_Commands_python --platform $opt_p --queue $opt_q --mem 2 --throttle_nodes 95 --cmds_per_node 10 $opt_o 2>&1 | tee $opt_o.log";
 	synima::process_cmd($cmd);
-} elsif($opt_g =~ m/n|N/) {
+} elsif($opt_g =~ m/n/i) {
 	open my $fh, '<', $opt_o or die "Cannot open $opt_o : $!\n";
 	while(my $line=<$fh>) {
 		chomp $line;

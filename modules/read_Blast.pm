@@ -29,8 +29,10 @@ sub make_all_vs_all_blast_search_cmds_from_repo {
 	open my $blast_cmds_ofh, '>', $outfile or die "Error, cannot write to $outfile\n";
 	foreach my $genomeA (@genomes) {
 		my $genomeA_file = $data_manager->get_data_dump_filename($genomeA, $type);
+		$genomeA_file .= ".synima-parsed.$type";
 		foreach my $genomeB (@genomes) {
 			my $genomeB_file = $data_manager->get_data_dump_filename($genomeB, $type);
+			$genomeB_file .= ".synima-parsed.$type";
 
 			# make blastable using formatdb
 			&make_genome_blastable_using_formatdb($genomeB_file, $type);

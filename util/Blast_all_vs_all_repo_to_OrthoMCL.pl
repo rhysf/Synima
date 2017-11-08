@@ -15,13 +15,7 @@ use read_GFF;
 # Opening commands
 my $usage = "Usage: perl $0 -r <Repo_spec>\n
 Optional: -t Type (PEP/CDS) [PEP]
-          -o Out directory [OMCL_outdir]
-	  -f Feature wanted from GFF [mRNA]
-	  -s Seperator in GFF description for gene names (\" ; etc) [;]
-	  -d GFF description part number with the parent/gene info [0]
-	  -m Remove additional comments in column [Parent=]
-Notes:    FASTA ID's and GFF ID's must match up to work - and must be standardised across each isolate. 
-          Use settings -f, -s, -d and -m to ensure they do\n";
+          -o Out directory [OMCL_outdir]\n";
 our($opt_r, $opt_t, $opt_o, $opt_f, $opt_s, $opt_d, $opt_m);
 getopt('rtofsdm');
 die $usage unless($opt_r);
@@ -39,9 +33,11 @@ my $m8_to_orthomcl = "$Bin/support_scripts/Blast_m8_to_OrthoMCL_gg_and_bpo_input
 my $OrthoMCL = "$Bin/support_scripts/OrthoMCL.pl";
 foreach($m8_to_orthomcl, $OrthoMCL){ die "Cannot find $_ : $!\n" unless(-e $_); }
 
+# Input
+my $all_annotations = "$opt_r.all.GFF3";
+
 # Output directory and files
 `mkdir $opt_o`;
-my $all_annotations = "$opt_o/all_annotations.gff3";
 my $all_blast_pairs = "$opt_o/all_blast_pairs.m8";
 my $genome_codes_out = "$opt_o/for_omcl.genome_codes";
 my $blast_pairs_gcoded = "$opt_o/for_omcl.Gcoded.m8";
@@ -49,11 +45,8 @@ my $blast_pairs_gcoded = "$opt_o/for_omcl.Gcoded.m8";
 # Get blast data into a single file
 &retrieve_blast_pairs($opt_r, $opt_t, $all_blast_pairs);
 
-# Get all annotation files together into one gff3
-gfffile::combine_all_gff3_files_in_repo($opt_r, $all_annotations);
-
 # Assign genome codes to genes for omcl
-my ($trans_id_to_genome, $genome_to_code) = gfffile::save_genome_codes_from_gff3($all_annotations, $opt_f, $opt_s, $opt_d, $opt_m);
+my ($trans_id_to_genome, $genome_to_code) = gfffile::save_genome_codes_from_synima_parsed_gff3($all_annotations);
 $genome_to_code = &assign_genome_codes($genome_to_code, $genome_codes_out);
 &write_gcoded_m8_and_sort($trans_id_to_genome, $genome_to_code, $all_blast_pairs, $blast_pairs_gcoded);
 
@@ -70,21 +63,24 @@ my $omcl_log_text = `cat $opt_o/omcl.log`;
 $omcl_log_text =~ /Final ORTHOMCL Result: (\S+)/ or die "Error, cannot extract final result filename from $opt_o/omcl.log";
 my $omcl_results_file = $1 or die "Error, cannot extract final result filename from $opt_o/omcl.log";
 my $base_filename = basename($omcl_results_file);
+my $tmp_dirname = dirname($omcl_results_file);
 my $new_filename = cwd() . "/$base_filename";
 $cmd = "mv $omcl_results_file $new_filename";
 synima::process_cmd($cmd);
-warn "Relocated $omcl_results_file to here as $base_filename\n";
+warn "Relocated $omcl_results_file to $base_filename\n";
+$cmd = "rm -r $tmp_dirname";
+synima::process_cmd($cmd);
 print "Done.\n";
 
 sub retrieve_blast_pairs {
 	my ($repo_spec, $type, $output) = @_; 
 
-	# Genomez in lexical order from repo spec
+	# Genomes in lexical order from repo spec
 	my $data_manager = new DataSpecFileParser($repo_spec);
 	my @genomes = $data_manager->get_genome_list();
 	@genomes = sort @genomes; 
 
-	# make sure each protein file is blastable
+	# Make each protein file blastable
 	warn "retrieve_blast_pairs: Printing to $output\n";
 	my @blast_cmds;
 	for (my $i = 0; $i <= $#genomes; $i++) {
@@ -92,7 +88,7 @@ sub retrieve_blast_pairs {
 		GENOMES2: for (my $j = $i; $j <= $#genomes; $j++) {
 			my $genomeB = $genomes[$j];
 			my $genomeA_vs_genomeB_blast_file = &RBH_manager::get_blast_output_file($data_manager, $genomeA, $genomeB, $type);
-			die "Error, no required blast output file: $genomeA_vs_genomeB_blast_file" if (! -s $genomeA_vs_genomeB_blast_file);
+			die "Error, no required blast output file: $genomeA_vs_genomeB_blast_file\n" if (! -s $genomeA_vs_genomeB_blast_file);
 
 			# Print blast commands (only for OMCL, and not RBH)
 			&retrieve_hits($genomeA_vs_genomeB_blast_file, $output);
@@ -101,7 +97,7 @@ sub retrieve_blast_pairs {
 			next GENOMES2 if ($genomeA eq $genomeB);
  
 			my $genomeB_vs_genomeA_blast_file = &RBH_manager::get_blast_output_file($data_manager, $genomeB, $genomeA, $type);
-			die "Error, no required blast output file: $genomeB_vs_genomeA_blast_file" if (! -s $genomeB_vs_genomeA_blast_file);
+			die "Error, no required blast output file: $genomeB_vs_genomeA_blast_file\n" if (! -s $genomeB_vs_genomeA_blast_file);
 			&retrieve_hits($genomeB_vs_genomeA_blast_file, $output);
 		}
 	}

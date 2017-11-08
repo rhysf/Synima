@@ -8,7 +8,7 @@ use Data::Dumper;
 use FindBin qw($Bin);
 use lib "$Bin/modules";
 use Synima;
-use read_FASTA;
+#use read_FASTA;
 use read_DAG;
 use read_Tab;
 use write_Rscript;

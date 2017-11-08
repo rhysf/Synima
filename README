@@ -116,10 +116,15 @@ SynIma and wrapper script parameters are shown below, followed by their default 
 
 Create_full_repo_sequence_databases.pl 
 Parameters: -r ./Repo_spec.txt []
+Optional:   -f Feature wanted from GFF [mRNA]
+	    -s Seperator in GFF description for gene names (\" ; etc) [;]
+	    -d GFF description part number with the parent/gene info [0]
+	    -m Remove additional comments in column [Parent=]
+Notes:      Will copy all transcripts and specified features from GFF into primary fasta files
 
 Blast_grid_all_vs_all.pl
 Parameters: -r ./Repo_spec.txt []
-Optional:   -t Type of alignment. Can be either PEP (peptide) or CDS (Complementarity-determining region) [PEP]
+Optional:   -t Type of alignment. Can be either PEP (peptide) or CDS (Complementarity-determining sequence) [PEP]
             -c Number of best matches to capture between species [5]
             -s Number of top hits to capture in self-searches for paralogs [1000]  
             -e E-value cutoff [1e-20]
@@ -131,18 +136,12 @@ Notes:      BLAST legacy tools formatdb and blastall are needed in $PATH
 
 Blast_all_vs_all_repo_to_OrthoMCL.pl 
 Parameters: -r ./Repo_spec.txt []
-Optional:   -t Type of alignment. Can be either PEP (peptide) or CDS (Complementarity-determining region) [PEP]
+Optional:   -t Type of alignment. Can be either PEP (peptide) or CDS (Complementarity-determining sequence) [PEP]
             -o Out directory [OMCL_outdir]
-	    -f Feature wanted from GFF [mRNA]
-	    -s Seperator in GFF description for gene names (" ; etc) [;]
-	    -d GFF description part number with the parent/gene info [0]
-	    -m Remove additional comments in column [Parent=]
-Notes:      FASTA ID's and GFF ID's must match up to work - and must be standardised across each isolate. 
-            Use settings -f, -s, -d and -m to ensure they do
 
 Blast_all_vs_all_repo_to_RBH.pl
 Parameters: -r ./Repo_spec.txt
-Optional:   -t Type of alignment. Can be either PEP (peptide) or CDS (Complementarity-determining region) (PEP/CDS) [PEP]
+Optional:   -t Type of alignment. Can be either PEP (peptide) or CDS (Complementarity-determining sequence) (PEP/CDS) [PEP]
 	    -o Out directory [RBH_outdir]
 	    -g Run commands on the grid (y/n) [n]
 	    -p Platform (UGER, LSF, GridEngine) [UGER]
@@ -153,7 +152,7 @@ Parameters: -o Ortholog file (E.g. PEP.RBH.OrthoClusters, all_orthomcl.out) []
 Optional:   -t Type of clustering (OMCL, RBH) [OMCL]
             -d Outdir from Blast_all_vs_all_repo_to_OrthoMCL/RBH.pl [OMCL_outdir]
 	    -r Repo Spec [./Repo_spec.txt]
-            -p Repo Spec Peptide file [./Repo_spec.txt.all.pep]
+            -p Repo Spec Peptide file [./Repo_spec.txt.all.PEP]
 
 DAGchainer_from_gene_clusters.pl 
 Parameters: -r ./Repo_spec.txt []
@@ -165,10 +164,6 @@ Optional:   -z File containing a list of genomes to restrict the analysis to []
             -g Run commands on the grid (y/n) [n]
             -p Platform (UGER, LSF, GridEngine) [UGER]
             -q Queue (hour, short, long) [short]
-	    -f Feature wanted from GFF [mRNA]
-	    -s Seperator in GFF description for gene names (\" ; etc) [;]
-	    -d GFF description part number with the parent/gene info [0]
-	    -m Remove additional comments in column [Parent=]
 	    -v Verbose (y/n) [n]
 Notes:      GFF specifications (-f, -s, -d, -m) need to be the same as specified during 
             Blast_all_vs_all_repo_to_OrthoMCL.pl or Blast_all_vs_all_repo_to_RBH.pl";

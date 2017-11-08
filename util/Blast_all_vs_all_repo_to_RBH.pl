@@ -32,7 +32,8 @@ die "-t is not PEP or CDS: $opt_t\n" if($opt_t !~ m/^(PEP|CDS)$/);
 die "-p is not UGER, LSF or GridEngine: $opt_p\n" if($opt_p !~ m/^(UGER|LSF|GridEngine)$/);
 
 # Dependencies
-my $uname = $ENV{HOSTTYPE};
+my $uname = `uname`;
+chomp $uname;
 my $slclust = "$Bin/support_scripts/slclust.$uname";
 foreach($slclust) { die "Cannot find $_ : $!\n" unless(-e $_); }
 
@@ -240,23 +241,6 @@ sub get_gene_annotations {
 			};
 			$annot_id_to_annotations{$id} = $struct;
 		}
-		#my $annot_basic_file = $data_manager->get_data_dump_filename($genome, 'AnnotationBasic');
-		#open my $fh, '<', $annot_basic_file or die "Error, cannot open file $annot_basic_file : $!\n";
-		#while (my $line=<$fh>) {
-		#	chomp $line;
-		#	my ($gene_id, $trans_id, $locus, $name) = split /\t/, $line;
-		#	my $struct = { 
-		#		gene_id => $gene_id,
-		#		trans_id => $trans_id,
-		#		genome => $genome,
-		#		locus => $locus,
-		#		name => $name,
-		#	};
-		#	$annot_id_to_annotations{$gene_id} = $struct;
-		#	$annot_id_to_annotations{$trans_id} = $struct;
-		#	$annot_id_to_annotations{$locus} = $struct if $locus ne "None";
-		#}
-		#close $fh;
 	}
 	return \%annot_id_to_annotations;
 }

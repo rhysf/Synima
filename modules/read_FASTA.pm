@@ -71,7 +71,7 @@ sub fasta_broad_format_to_struct {
 	my $file = $_[0];
 
 	my %all_proteins;
-	warn "save_all_proteins for Broad formatted $file...\n";
+	warn "fasta_broad_format_to_struct: $file...\n";
 	open my $fh, '<', $file or die "Unable to open file $file : $!\n";
 	PROTEIN: while(my $line=<$fh>){
 		chomp $line;
@@ -143,5 +143,34 @@ sub create_transcript_functinal_annotation_map {
 	return 1;
 }
 
+sub split_fasta_seq_dictionary_by_species {
+	my ($repo_spec, $type) = @_;
+
+	# Parse repo spec file
+	my $data_manager = new DataSpecFileParser($repo_spec);
+	my @genomes = $data_manager->get_genome_list();
+
+	# Input seq dictionary
+	my $input = "$repo_spec.all.$type";
+	die "Cannot find $input. Re-run Create_full_repo_sequence_databases.pl\n" if(! -e $input);
+	my ($sequences, $descriptions, $order) = &fasta_id_to_seq_hash($input);
+
+	# Split seq dictionary by genomes
+	warn "Splitting seq dictionary for blasting...\n";
+	foreach my $genome (@genomes) {
+		my $output_file = $data_manager->get_data_dump_filename($genome, $type);
+		$output_file .= ".synima-parsed.$type";
+		warn "$genome = $output_file...\n";
+		open my $ofh, '>', $output_file or die "Cannot open output file $output_file : $!\n";
+		foreach my $transcript_id(keys %{$sequences}) {
+			my $id_line = ">$transcript_id $$descriptions{$transcript_id}";
+			my ($transcript_id, $gene_id, $locus_name, $func_annot, $genome_found, $analysis) = &parse_protein_file_line($id_line);
+			next if($genome_found ne $genome);
+			print $ofh ">$transcript_id\n$$sequences{$transcript_id}\n"
+		}
+		close $ofh;
+	}
+	return 1;
+}
 
 1;

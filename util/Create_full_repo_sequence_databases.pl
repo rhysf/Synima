@@ -7,82 +7,100 @@ use FindBin qw($Bin);
 use lib "$Bin/../modules/";
 use DataSpecFileParser;
 use Synima;
+use read_GFF;
+use read_FASTA;
 
 ### rfarrer@broadinstitute.org
 
 # Opening commands
 my $usage = "Usage: perl $0 -r <Repo_spec.txt>
-Notes: Will copy all transcripts for each gene into primary fasta files\n";
-our($opt_r);
-getopt('r');
+Optional: -f Feature wanted from GFF [mRNA]
+	  -s Seperator in GFF description for gene names (\" ; etc) [;]
+	  -d GFF description part number with the parent/gene info [0]
+	  -m Remove additional comments in column [Parent=]
+Notes: Will copy all transcripts and specified features from GFF into primary fasta files\n";
+our($opt_r, $opt_f, $opt_s, $opt_d, $opt_m);
+getopt('rfsdm');
 die $usage unless ($opt_r);
 die "Cannot open $opt_r : $!\n" unless (-e $opt_r);
+if(!defined $opt_f) { $opt_f = 'mRNA'; }
+if(!defined $opt_s) { $opt_s = ';'; }
+if(!defined $opt_d) { $opt_d = 0; }
+if(!defined $opt_m) { $opt_m = 'Parent='; }
 
 # Perform data retrievals
 my $data_manager = new DataSpecFileParser($opt_r);
 my @genomes = $data_manager->get_genome_list();
 foreach my $genome (@genomes) {
-	print "// Indexing $genome\n";		
+	warn "Indexing $genome...\n";		
 	my $genome_fasta = $data_manager->get_data_dump_filename($genome, 'Genome');
 }
 
-# Generate individual genome attribute summaries.
-#print STDERR "-Summarizing attributes for each genome\n";
-#my $cmd = "$misc_util/describe_gene_attributes.pl $opt_r";
-#synima::process_cmd($cmd);
+# Create repository sequence databases
+&create_full_repo_sequence_databases($data_manager, \@genomes, $opt_r);
 
-# Create database files for pep and cds and make blastable
-my $pep_database = "$opt_r.all.pep";
-my $cds_database = "$opt_r.all.cds";
-&create_full_repo_sequence_databases($data_manager, \@genomes, $pep_database, $cds_database);
+# Get all annotation files together into one gff3
+my $all_annotations = "$opt_r.all.GFF3";
+gfffile::combine_all_gff3_files_in_repo($opt_r, $all_annotations, $opt_f, $opt_s, $opt_d, $opt_m);
+
+# Check FASTA and GFFs match
+warn "Checking FASTA and GFF repository sequence databases match...\n";
+foreach my $type(qw(PEP CDS)) {
+	my $fasta = "$opt_r.all.$type";
+	my ($sequences, $descriptions, $order) = fastafile::fasta_id_to_seq_hash($fasta);
+	my ($gff, $strand) = gfffile::gff_to_contig_parent_to_cds_hash($all_annotations);
+	my ($found, $not_found, $total) = (0, 0, 0);
+	foreach my $contig(keys %{$gff}) {
+		foreach my $parent(keys %{$$gff{$contig}}) {
+			if(defined $$sequences{$parent}) { $found++; }
+			else { $not_found++; }
+		}
+	}
+	$total = ($found + $not_found);
+	warn "\n\n\n$found / $total found\n";
+	if($found eq $total) { warn "$fasta and $all_annotations repository sequence databases are correctly formatted.\n"; }
+	else { warn "$fasta and $all_annotations repository sequence databases are not correctly formatted. Change settings and re-run, or rename ID's in FASTA or GFF to match.\n"; }
+}
+warn "Finished.\n";
 
 sub create_full_repo_sequence_databases {
-	my ($data_manager, $genomes_aref, $pep_db_filename, $cds_db_filename) = @_;
-
-	# Open output files
-	open my $cds_fh, '>', $cds_db_filename or die "Error, cannot write to $cds_db_filename : $!\n";
-	open my $pep_fh, '>', $pep_db_filename or die "Error, cannot write to $pep_db_filename : $!\n";
+	my ($data_manager, $genomes_aref, $repo) = @_;
 
 	# Copy across CDS and PEP for each genome
-	# Broad Format = >7000011728610201 gene_id=7000011728610200 locus=None name="flagellum-specific ATP synthase" genome=Esch_coli_MGH121_V1 analysisRun=Esch_coli_MGH121_V1_POSTPRODIGAL_2	
-	warn "Writing $cds_db_filename and $pep_db_filename...\n";
+	warn "Creating repository sequence databases...\n";
 	foreach my $genome (@$genomes_aref) {
-		warn "\tCopying over pep and cds for $genome\n";
-		my $pep_file = $data_manager->get_data_dump_filename($genome, 'PEP') or die "Error, cannot find pep file for genome: $genome : $!\n";
-		open my $fh, '<', $pep_file or die "Error, cannot open file $pep_file : $!\n";
-		while (my $line=<$fh>) { 
-			chomp $line;
-			$line = &make_broad_style_id_for_fasta($line, $genome);
-			print $pep_fh "$line\n"; 
+		foreach my $type(qw(PEP CDS)) {
+			my $file = $data_manager->get_data_dump_filename($genome, $type) or die "Error, cannot find $type file for genome: $genome : $!\n";
+			my $ofile = "$repo.all.$type";
+			warn "Copying $file to $ofile...\n";
+			&parse_and_join_fasta_to_outfiles($file, $ofile, $genome);
 		}
-		close $fh;
-
-	   	my $cds_file = $data_manager->get_data_dump_filename($genome, 'CDS') or die "Error, cannot find cds file for genome: $genome : $!\n";
-	   	open $fh, '<', $cds_file or die "Error, cannot open $cds_file : $!\n";
-	   	while (my $line=<$fh>) { 
-			chomp $line;
-			$line = &make_broad_style_id_for_fasta($line, $genome);
-			print $cds_fh "$line\n"; 
-		}
-		close $fh;
 	}
-	warn "Finished writing $cds_db_filename and $pep_db_filename\n";
-
-	# Close output files and return
-	close $cds_fh;
-	close $pep_fh;
 	return 1;
 }
 
+sub parse_and_join_fasta_to_outfiles {
+	my ($file, $ofile, $genome) = @_;
+	open my $fh,  '<', $file  or die "Error, cannot open file $file : $!\n";
+	open my $ofh, '>>', $ofile or die "Error, cannot write to $ofile : $!\n";
+	while (my $line=<$fh>) { 
+		chomp $line;
+		$line = &make_broad_style_id_for_fasta($line, $genome);
+		print $ofh "$line\n"; 
+	}
+	close $fh;
+	close $ofh;
+	return 1;
+}
+
+# Broad Format = >7000011728610201 gene_id=7000011728610200 locus=None name="flagellum-specific ATP synthase" genome=Esch_coli_MGH121_V1 analysisRun=Esch_coli_MGH121_V1_POSTPRODIGAL_2	
 sub make_broad_style_id_for_fasta {
 	my ($line, $genome) = @_;
-	if(($line =~ m/^>/) && (($line !~ m/gene_id\=/) && ($line !~ m/locus\=/) && ($line !~ m/name\=/))) { 
-		my $id = $line;
+	if(($line =~ m/^>/) && (($line !~ m/gene_id\=/) && ($line !~ m/locus\=/) && ($line !~ m/name\=/) && ($line !~ m/genome\=/) && ($line !~ m/analysisRun\=/))) { 
+		my @id_parts = split / /, $line;
+		my $id = $id_parts[0];
 		$id =~ s/^>//;
-
-		# If there is a description - move into a single long id for parsing later
-		$line =~ s/ /_/g;
-		$line .= " gene_id=$id locus=$id name=\"hypothetical protein\" genome=$genome analysisRun=$genome\_1";
+		$line = ">$id gene_id=$id locus=$id name=\"hypothetical protein\" genome=$genome analysisRun=$genome\_1";
 	}
 	return $line;
 }
