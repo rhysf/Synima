@@ -1,11 +1,11 @@
-All documentation for SynIma is provided at the SynIma website:
+All documentation for Synima can be found at:
 
 https://github.com/rhysf/Synima
 
-SynIma (Synteny Imager) is a program for visualising syntenic regions from 
+Synima (Synteny Imager) is a program for visualising syntenic regions from 
 orthologous genes, infered by reciprocal best hits (RBH) from BLAST, or 
 OrthoMCL, followed by DAGchainer. OrthoMCL and DAGchainer are
-bundled with SynIma, and wrapper scripts are provided in /util/. A number 
+bundled with Synima, and wrapper scripts are provided in /util/. A number 
 of the scripts launch several jobs that can be run on a grid (LSF, 
 GridEngine, UGER are supported).
 
@@ -44,7 +44,7 @@ perl ../SynIma.pl -a Repo_spec.txt.dagchainer.aligncoords \
 Description of example pipeline:
 --------------------------------
 
-SynIma visualises aligncoords and aligncoords.spans files, which are tab 
+Synima visualises aligncoords and aligncoords.spans files, which are tab 
 delimited text based coordinate files describing sub-genomic regions of 
 synteny between two or more genomes. Having cloned a local copy of all 
 the code using git clone, and navigated to the examples sub-folder, the 
@@ -79,13 +79,13 @@ The GFF should have gene or mRNA features, with identifiers that are also in the
 .cds and .pep FASTA files, which contain the Complementarity-determining 
 region (cds) and peptide (pep) sequences respectively. GFF ID's can be listed as such:
 cgbd CNB_WM276_v2 mRNA 450360 453023 . + . ID=012346;Parent=012345;Name=actin
-or any other way that is specified explicitly for Blast_all_vs_all_repo_to_OrthoMCL/RBH.pl
-and DAGchainer_from_gene_clusters.pl. Gene ID's in the two FASTA files can be a simple
-word i.e. >CBBG_0001 or they can have multiple fields e.g.
->01 gene_id=02 locus=03 name="ATPS" genome=Esch_coli analysisRun=Esch_coli_Augustus
+or any other way that is specified explicitly for Create_full_repo_sequence_databases.pl.
+Gene ID's in the two FASTA files can be a single word i.e. >CBBG_0001 or they 
+can have multiple fields e.g. >01 gene_id=02 locus=03 name="ATPS" 
+genome=Esch_coli analysisRun=Esch_coli_Augustus
 
 The second step is to run all vs all BLAST hits using Blast_grid_all_vs_all.pl.
-Peptide or nucleotide alignments are possible, although peptide is recomended.
+Peptide or nucleotide alignments are possible, although peptide is generally recomended.
 This step can take a long time, and therefore, the option of distributing jobs 
 to a cluster via LSF, SGE and UGE is provided (if available). This step will 
 create folders in each of the genome folders called RBH_blast_[PEP/CDS]. This 
