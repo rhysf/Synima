@@ -290,6 +290,7 @@ sub print_chromosome_name {
 	my $chr_name_new = $chr_name;
 	foreach(@{$contig_name_replace_array}) { 
 		my @parts = split /:/, $_;
+		if(!defined $parts[1]) { $parts[1] = ''; }
 		$chr_name_new =~ s/^$parts[0]/$parts[1]/;
 	}
 
