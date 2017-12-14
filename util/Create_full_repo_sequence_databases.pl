@@ -17,7 +17,7 @@ my $usage = "Usage: perl $0 -r <Repo_spec.txt>
 Optional: -f Feature wanted from GFF [mRNA]
 	  -s Seperator in GFF description for gene names (\" ; etc) [;]
 	  -d GFF description part number with the parent/gene info [0]
-	  -m Remove additional comments in column [Parent=]
+	  -m Remove additional comments in column [ID=]
 Notes: Will copy all transcripts and specified features from GFF into primary fasta files\n";
 our($opt_r, $opt_f, $opt_s, $opt_d, $opt_m);
 getopt('rfsdm');
@@ -26,7 +26,7 @@ die "Cannot open $opt_r : $!\n" unless (-e $opt_r);
 if(!defined $opt_f) { $opt_f = 'mRNA'; }
 if(!defined $opt_s) { $opt_s = ';'; }
 if(!defined $opt_d) { $opt_d = 0; }
-if(!defined $opt_m) { $opt_m = 'Parent='; }
+if(!defined $opt_m) { $opt_m = 'ID='; }
 
 # Perform data retrievals
 my $data_manager = new DataSpecFileParser($opt_r);
