@@ -85,7 +85,7 @@ can have multiple fields e.g. >01 gene_id=02 locus=03 name="ATPS"
 genome=Esch_coli analysisRun=Esch_coli_Augustus
 
 The second step is to run all vs all BLAST hits using Blast_grid_all_vs_all.pl.
-Peptide or nucleotide alignments are possible, although peptide is generally recomended.
+Peptide or nucleotide alignments are possible, although peptide is generally recommended.
 This step can take a long time, and therefore, the option of distributing jobs 
 to a cluster via LSF, SGE and UGE is provided (if available). This step will 
 create folders in each of the genome folders called RBH_blast_[PEP/CDS]. This 
@@ -107,7 +107,19 @@ The fifth step is to run DAGChainer on the ortholog summary using
 DAGchainer_from_gene_clusters.pl.
 
 The sixth and final step is to run SynIma.pl on the aligncoords and aligncoords.spans 
-output from DAGChainer.
+output from DAGChainer. 
+
+Once you have identified orthologs with the previous steps 1-5, you can re-run 
+only this step with updated parameters to generate new figures. If Synima
+finds the config.txt file (generated from the first time run, and in the same folder as
+the figure, by default SynIma-output/config.txt), it will run using the parameters 
+specified in this file (rather than use any updated parameters on the command 
+line). Config.txt includes a number of parameters that can change the appearance or layout
+of the figure. I recommend plotting both chromosome/contig synteny (c) and gene synteny (g)
+separately, as either can give greater clarity depending on the input. By default, Synteny is
+shown as a partially transparent (alpha factor 0.5) azure4, although this can be changed to 
+any other R color (E.g. http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf). Due to the 
+color transparency, overlapping synteny will appear shaded. 
 
 Individual script details:
 --------------------------
