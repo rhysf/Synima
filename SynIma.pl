@@ -71,7 +71,7 @@ my ($gene_synteny, $genes) = daglines::save_aligncoords_and_reverse_wrapper_from
 # Save genome synteny and gene subsets (specified as lists)
 my $genome_synteny;
 my $genes_subsets;
-for(my $i=1; $i<=3; $i++) {
+for(my $i=1; $i<=5; $i++) {
 	my $file_name1 = "aligncoords_spans_location$i";
 	my $file_name2 = "gene_list$i";
 	if($$synima_data{$file_name1}) { $$genome_synteny{$file_name1} = daglines::save_aligncoords_spans_and_reverse_wrapper_from_config($synima_data, $file_name1); }
@@ -172,9 +172,10 @@ for(my $i=0; $i<$$synima_data{'genome_number_of'}; $i++) {
 		}
 
 		# Plot genes specified in lists
-		for(my $i=1; $i<=3; $i++) {
+		GENELIST: for(my $i=1; $i<=5; $i++) {
 			my $file_name = "gene_list$i";
 			my $colour = "gene_list_colour$i";
+			last GENELIST if(!defined $$synima_data{$colour});
 			if($opt_v eq 'y') { warn "Plotting $file_name ($$synima_data{$colour})...\n"; }
 			synima::plot_genes($gene_up, $gene_down, $cumulative_length, 1, $$synima_data{$colour}, 16,1, 'points', $$genes_subsets{$file_name}{$name1}{$chromosomes}, $ofh);
 			($gene_up, $gene_down) = synima::find_y_pos_for_genes($gene_up, $gene_down, $$synima_data{'genome_half_way_point'}, 0.12, 0.03, 0.12, 0.03);

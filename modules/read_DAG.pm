@@ -26,10 +26,24 @@ sub save_aligncoords {
 			next GENES if($lines[$i] =~ m/##/);
 			my @alignment_info = split /\s+/, $lines[$i];
 			my ($genome1, $chr1, $genome1_gene_name, $start1, $stop1, $ignore1, $ignore2, $genome2, $chr2, $genome2_gene_name, $start2, $stop2) = @alignment_info;
-			die "unexpected aligncoords format for $file. Check settings/config file. line = $lines[$i]\n" if(!defined $stop2);
+			die "Error: Unexpected aligncoords format for $file. Check settings/config file. line = $lines[$i]\n" if(!defined $stop2);
+
+			# Sometimes genome IDs have a space followed by a description. Check there is a : in the expected variable. If not, remove first, and reinitalise array
+			if(($genome1_gene_name !~ m/\:/) && ($start1 =~ m/\:/)) {
+				splice @alignment_info, 2, 1;
+				($genome1, $chr1, $genome1_gene_name, $start1, $stop1, $ignore1, $ignore2, $genome2, $chr2, $genome2_gene_name, $start2, $stop2) = @alignment_info;
+			}
+			if(($genome2_gene_name !~ m/\:/) && ($start2 =~ m/\:/)) {
+				splice @alignment_info, 9, 1;
+				($genome1, $chr1, $genome1_gene_name, $start1, $stop1, $ignore1, $ignore2, $genome2, $chr2, $genome2_gene_name, $start2, $stop2) = @alignment_info;
+			}
+
+			# Genomes and gene name
 			my @gen1 = split /\:/, $genome1_gene_name;
 			my @gen2 = split /\:/, $genome2_gene_name;
-		
+			die "Error: Unexpected aligncoords format for genome and gene name (1) separated by ; ($genome1_gene_name) on line $lines[$i]\n" if(!defined $gen1[1]);
+			die "Error: Unexpected aligncoords format for genome and gene name (2) separated by ; ($genome2_gene_name) on line $lines[$i]\n" if(!defined $gen2[1]);
+
 			# Save gene positions
 			$genes{$genome1}{$chr1}{$gen1[1]}{$start1} = $stop1;
 			$genes{$genome2}{$chr2}{$gen2[1]}{$start2} = $stop2;
@@ -77,8 +91,12 @@ sub save_genome_names_hash_from_aligncoords_spans {
 		chomp $line;
 		my @bits = split /\t/, $line;
 		my ($genome_and_contig1, $ss1, $size1, $genome_and_contig2, $ss2, $size2) = (@bits);
-		my @gc1 = split /;/, $genome_and_contig1;	
+		die "Unpected format of $line in file $file\n" if(!defined $size2);
+
+		my @gc1 = split /;/, $genome_and_contig1;
 		my @gc2 = split /;/, $genome_and_contig2;
+		die "Unexpected format of $genome_and_contig1 (expected ; between genome and contig) on line $line in file $file\n" if(!defined $gc1[1]);
+		die "Unexpected format of $genome_and_contig2 (expected ; between genome and contig) on line $line in file $file\n" if(!defined $gc2[1]);
 		$spans_info{$gc1[0]} = 1;
 		$spans_info{$gc2[0]} = 1; 
 	}
@@ -102,8 +120,10 @@ sub save_contig_lengths_from_config {
 
 sub save_aligncoords_and_reverse_wrapper_from_config {
 	my $config_data = $_[0];
+	warn "save_aligncoords_and_reverse_wrapper_from_config...\n";
 	my ($gene_synteny, $genes) = &save_aligncoords($$config_data{'aligncoords_location'}); 
 	$gene_synteny = &reverse_placement_on_chromosome_for_genes_hash($gene_synteny, $config_data);
+	warn "save_aligncoords_and_reverse_wrapper_from_config: finished\n";
 	return ($gene_synteny, $genes);
 }
 
@@ -274,7 +294,7 @@ sub find_contig_order_from_aligncoords_spans_and_fastas {
 	my @new_order2;
 	my %contigs_found;
 	ORDER: foreach my $chr_order(@{$fasta_order1}) {
-		my $search_for = "grep \$'$isolate_name1;$chr_order\\t' $aligncoords_spans | grep $isolate_name2";
+		my $search_for = "grep \$'$isolate_name1;$chr_order\\t' $aligncoords_spans | grep \$'$isolate_name2;'";
 		if($verbose eq 'y') { warn "Looking for syntenic regions between $isolate_name1 ($chr_order) and $isolate_name2... using $search_for\n"; }
 		my $lines = `$search_for`;
 		die "found nothing for: grep \$'$isolate_name1;$chr_order\t' $aligncoords_spans | grep $isolate_name2.... investigate.\n" if(!defined $lines);

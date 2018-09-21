@@ -40,7 +40,7 @@ sub write_config {
 	my $order_of_genomes    = $params[16]; # x
 	my $plot_ind_genes      = $params[17]; # z
 	if($verbose eq 'y') { 
-		warn "write_congig: -a $aligncoords -b $aligncoords_spans1 -c $config_file -e $genome_extensions -g $plot_contig_synteny -i $width_pixels -j $height_pixels -k $gene_list1 -l $gene_list2 -n $genome_labels -o $gene_list3 -r $run_synima -t $aligncoords_spans2 -u $aligncoords_spans3 -v $verbose -w $left_margin -x $order_of_genomes -z $plot_ind_genes\n"; 
+		warn "write_config: -a $aligncoords -b $aligncoords_spans1 -c $config_file -e $genome_extensions -g $plot_contig_synteny -i $width_pixels -j $height_pixels -k $gene_list1 -l $gene_list2 -n $genome_labels -o $gene_list3 -r $run_synima -t $aligncoords_spans2 -u $aligncoords_spans3 -v $verbose -w $left_margin -x $order_of_genomes -z $plot_ind_genes\n"; 
 	}
 
 	# Check input files can be read
