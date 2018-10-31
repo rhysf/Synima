@@ -41,7 +41,9 @@ Notes:     Config.txt will be made automatically if not present, and read automa
 	   Config.txt can be manually edited after creation.
 	   Default genome labels will be as they appear in aligncoords
 	   Order of genomes must have names as they appear in aligncoords
-	   Aligncoords.spans and Gene ID files will be highlighted according to the config\n";
+	   Aligncoords.spans and Gene ID files will be highlighted according to the config
+Citation:  When publishing work that uses Synima please cite:
+	   Farrer RA (2017), BMC Bioinformatics 18:507\n";
 our($opt_a, $opt_b, $opt_c, $opt_d, $opt_e, $opt_f, $opt_g, $opt_h, $opt_i, $opt_j, $opt_k, $opt_l, $opt_m, $opt_n, $opt_o, $opt_p, $opt_q, $opt_r, $opt_s, $opt_t, $opt_u, $opt_v, $opt_w, $opt_x, $opt_y, $opt_z);
 getopt('abcdefghijklmnopqrstuvwxyz');
 die $usage unless (($opt_c) || ($opt_a && $opt_b));

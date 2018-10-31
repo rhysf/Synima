@@ -16,17 +16,12 @@ use read_GFF;
 my $usage = "Usage: perl $0 -r <Repo_spec>\n
 Optional: -t Type (PEP/CDS) [PEP]
           -o Out directory [OMCL_outdir]\n";
-our($opt_r, $opt_t, $opt_o, $opt_f, $opt_s, $opt_d, $opt_m);
+our($opt_r, $opt_t, $opt_o);
 getopt('rtofsdm');
 die $usage unless($opt_r);
 if(!defined $opt_t) { $opt_t = 'PEP'; }
 if(!defined $opt_o) { $opt_o = 'OMCL_outdir'; }
-if(!defined $opt_f) { $opt_f = 'mRNA'; }
-if(!defined $opt_s) { $opt_s = ';'; }
-if(!defined $opt_d) { $opt_d = 0; }
-if(!defined $opt_m) { $opt_m = 'Parent='; }
 die "-t needs to be PEP or CDS: $opt_t\n" unless ($opt_t =~ m/^(PEP|CDS)$/);
-die "-d needs to be a number: $opt_d\n" unless($opt_d =~ m/^\d+$/);
 
 # Scripts needed
 my $m8_to_orthomcl = "$Bin/support_scripts/Blast_m8_to_OrthoMCL_gg_and_bpo_input.pl";

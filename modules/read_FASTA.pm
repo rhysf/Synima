@@ -135,7 +135,7 @@ sub create_transcript_functinal_annotation_map {
 	while(my $line=<$fh>) {
 		chomp $line;
 		next if ($line !~ m/^>/);
-		my ($transcript_id, $gene_id, $locus_name, $func_annot, $genome, $analysis ) = &parse_protein_file_line($line);
+		my ($transcript_id, $gene_id, $locus_name, $func_annot, $genome, $analysis) = &parse_protein_file_line($line);
 		print $ofh "$transcript_id\t$gene_id\t$locus_name\t$func_annot\n";
 	}
 	close $fh;

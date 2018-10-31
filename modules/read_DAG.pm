@@ -129,6 +129,7 @@ sub save_aligncoords_and_reverse_wrapper_from_config {
 
 sub save_aligncoords_spans_and_reverse_wrapper_from_config {
 	my ($config_data, $file_name) = @_;
+	warn "save_aligncoords_spans_and_reverse_wrapper_from_config...\n";
 	my $genome_synteny = &save_aligncoords_spans($$config_data{$file_name});
 	$genome_synteny = &reverse_placement_on_chromosome_for_genomes_hash($genome_synteny, $config_data);
 	return $genome_synteny;
@@ -159,6 +160,7 @@ sub genes_subset_from_gene_list_from_config {
 
 sub genome_to_chromosome_to_length_hash_subset {
 	my $config_data = $_[0];
+	#warn "genome_to_chromosome_to_length_hash_subset...\n";
 	my (%chr_reversed);
 	return (\%chr_reversed) if(!defined $$config_data{'reverse_compliment'});
 
@@ -199,6 +201,7 @@ sub check_hash_keys_from_aligncoords {
 
 sub reverse_placement_on_chromosome_for_genomes_hash {
 	my ($ref_to_hash_to_reverse, $config_data) = @_;
+	warn "reverse_placement_on_chromosome_for_genomes_hash...\n";
 
 	# Save genome->chromosome hash subset of those to be reversed
 	my $chr_reversed = &genome_to_chromosome_to_length_hash_subset($config_data);

@@ -82,7 +82,7 @@ our $FORMATDB                            = "formatdb";
 my $uname = `uname`;
 chomp $uname;
 warn "Using $uname : $Bin/mcl.$uname\n";
-our $MCL                                 = "$Bin/mcl.$uname";
+our $MCL = "$Bin/mcl.$uname";
 
 # path
 our $PATH_TO_ORTHOMCL                    = "./";   # must end with "/" 
