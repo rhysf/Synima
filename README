@@ -35,7 +35,7 @@ perl ../util/Create_full_repo_sequence_databases.pl -r ./Repo_spec.txt
 perl ../util/Blast_grid_all_vs_all.pl -r ./Repo_spec.txt
 perl ../util/Blast_all_vs_all_repo_to_OrthoMCL.pl -r ./Repo_spec.txt
 ALTERNATIVELY: ../util/Blast_all_vs_all_repo_to_RBH.pl -r ./Repo_spec.txt
-perl ../util/OrthoMCL_or_RBH_to_summary.pl -o all_orthomcl.out
+perl ../util/Orthologs_to_summary.pl -o all_orthomcl.out
 perl ../util/DAGchainer_from_gene_clusters.pl -r ./Repo_spec.txt \
              -c GENE_CLUSTERS_SUMMARIES.OMCL/GENE_CLUSTERS_SUMMARIES.clusters
 perl ../SynIma.pl -a Repo_spec.txt.dagchainer.aligncoords \ 
@@ -99,9 +99,10 @@ OrthoMCL, but OrthoMCL has a limited number of genomes/genes that can be compare
 due to memory constraints.
 
 The forth step is to summarise the OrthoMCL output (OMCL_outdir/all_orthomcl.out), 
-or RBH output (RBH_outdir/PEP.RBH.OrthoClusters) using OrthoMCL_or_RBH_to_summary.pl.
-This step will create ortholog predictions in the output folders 
-GENE_CLUSTERS_SUMMARIES.OMCL or GENE_CLUSTERS_SUMMARIES.RBH respectively.
+or RBH output (RBH_outdir/PEP.RBH.OrthoClusters) or Orthofinder output (Orthofinder_outdir/
+Orthogroups.csv) using Orthologs_to_summary.pl. This step will create ortholog 
+predictions in the output folders GENE_CLUSTERS_SUMMARIES.OMCL or 
+GENE_CLUSTERS_SUMMARIES.RBH or GENE_CLUSTERS_SUMMARIES.Orthofinder respectively.
 
 The fifth step is to run DAGChainer on the ortholog summary using 
 DAGchainer_from_gene_clusters.pl.
@@ -151,6 +152,11 @@ Parameters: -r ./Repo_spec.txt []
 Optional:   -t Type of alignment. Can be either PEP (peptide) or CDS (Complementarity-determining sequence) [PEP]
             -o Out directory [OMCL_outdir]
 
+Blast_all_vs_all_repo_to_Orthofinder.pl
+Parameters: -r ./Repo_spec.txt []
+Optional:   -t Type of alignment. Can be either PEP (peptide) or CDS (Complementarity-determining sequence) [PEP]
+            -o Out directory [Orthofinder_outdir]
+
 Blast_all_vs_all_repo_to_RBH.pl
 Parameters: -r ./Repo_spec.txt
 Optional:   -t Type of alignment. Can be either PEP (peptide) or CDS (Complementarity-determining sequence) (PEP/CDS) [PEP]
@@ -159,10 +165,10 @@ Optional:   -t Type of alignment. Can be either PEP (peptide) or CDS (Complement
 	    -p Platform (UGER, LSF, GridEngine) [UGER]
 	    -q Queue name [short]
 
-OrthoMCL_or_RBH_to_summary.pl 
-Parameters: -o Ortholog file (E.g. PEP.RBH.OrthoClusters, all_orthomcl.out) []
-Optional:   -t Type of clustering (OMCL, RBH) [OMCL]
-            -d Outdir from Blast_all_vs_all_repo_to_OrthoMCL/RBH.pl [OMCL_outdir]
+Orthologs_to_summary.pl 
+Parameters: -o Ortholog file (E.g. PEP.RBH.OrthoClusters, all_orthomcl.out, Orthogroups.csv) []
+Optional:   -t Type of clustering (OMCL, RBH, Orthofinder) [OMCL]
+            -d Outdir from Blast_all_vs_all_repo_to_OrthoMCL (if used) [OMCL_outdir]
 	    -r Repo Spec [./Repo_spec.txt]
             -p Repo Spec Peptide file [./Repo_spec.txt.all.PEP]
 
