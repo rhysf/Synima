@@ -77,7 +77,7 @@ files are specified in the Data_repo, which should refer to the prefix of
 
 The GFF should have gene or mRNA features, with identifiers that are also in the 
 .cds and .pep FASTA files, which contain the Complementarity-determining 
-region (cds) and peptide (pep) sequences respectively. GFF ID's can be listed as such:
+sequence (cds) and peptide (pep) sequences respectively. GFF ID's can be listed as such:
 cgbd CNB_WM276_v2 mRNA 450360 453023 . + . ID=012346;Parent=012345;Name=actin
 or any other way that is specified explicitly for Create_full_repo_sequence_databases.pl.
 Gene ID's in the two FASTA files can be a single word i.e. >CBBG_0001 or they 
