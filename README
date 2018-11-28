@@ -76,8 +76,8 @@ files are specified in the Data_repo, which should refer to the prefix of
 [annotation-id].annotation.pep
 
 The GFF should have gene or mRNA features, with identifiers that are also in the 
-.cds and .pep FASTA files, which contain the Complementarity-determining 
-sequence (cds) and peptide (pep) sequences respectively. GFF ID's can be listed as such:
+.cds and .pep FASTA files, which contain the Coding sequence (cds) and peptide 
+(pep) sequences respectively. GFF ID's can be listed as such:
 cgbd CNB_WM276_v2 mRNA 450360 453023 . + . ID=012346;Parent=012345;Name=actin
 or any other way that is specified explicitly for Create_full_repo_sequence_databases.pl.
 Gene ID's in the two FASTA files can be a single word i.e. >CBBG_0001 or they 
@@ -137,7 +137,7 @@ Notes:      Will copy all transcripts and specified features from GFF into prima
 
 Blast_grid_all_vs_all.pl
 Parameters: -r ./Repo_spec.txt []
-Optional:   -t Type of alignment. Can be either PEP (peptide) or CDS (Complementarity-determining sequence) [PEP]
+Optional:   -t Type of alignment. Can be either PEP (peptide) or CDS (Coding sequence) [PEP]
             -c Number of best matches to capture between species [5]
             -s Number of top hits to capture in self-searches for paralogs [1000]  
             -e E-value cutoff [1e-20]
@@ -149,17 +149,17 @@ Notes:      BLAST legacy tools formatdb and blastall are needed in $PATH
 
 Blast_all_vs_all_repo_to_OrthoMCL.pl 
 Parameters: -r ./Repo_spec.txt []
-Optional:   -t Type of alignment. Can be either PEP (peptide) or CDS (Complementarity-determining sequence) [PEP]
+Optional:   -t Type of alignment. Can be either PEP (peptide) or CDS (Coding sequence) [PEP]
             -o Out directory [OMCL_outdir]
 
 Blast_all_vs_all_repo_to_Orthofinder.pl
 Parameters: -r ./Repo_spec.txt []
-Optional:   -t Type of alignment. Can be either PEP (peptide) or CDS (Complementarity-determining sequence) [PEP]
+Optional:   -t Type of alignment. Can be either PEP (peptide) or CDS (Coding sequence) [PEP]
             -o Out directory [Orthofinder_outdir]
 
 Blast_all_vs_all_repo_to_RBH.pl
 Parameters: -r ./Repo_spec.txt
-Optional:   -t Type of alignment. Can be either PEP (peptide) or CDS (Complementarity-determining sequence) (PEP/CDS) [PEP]
+Optional:   -t Type of alignment. Can be either PEP (peptide) or CDS (Coding sequence) (PEP/CDS) [PEP]
 	    -o Out directory [RBH_outdir]
 	    -g Run commands on the grid (y/n) [n]
 	    -p Platform (UGER, LSF, GridEngine) [UGER]
