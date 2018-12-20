@@ -163,7 +163,8 @@ sub split_fasta_seq_dictionary_by_species {
 		warn "$genome = $output_file...\n";
 		open my $ofh, '>', $output_file or die "Cannot open output file $output_file : $!\n";
 		foreach my $transcript_id(keys %{$sequences}) {
-			my $id_line = ">$transcript_id $$descriptions{$transcript_id}";
+			my $id_line = ">$transcript_id";
+			if(defined $$descriptions{$transcript_id}) { $id_line .= " $$descriptions{$transcript_id}"; }
 			my ($transcript_id, $gene_id, $locus_name, $func_annot, $genome_found, $analysis) = &parse_protein_file_line($id_line);
 			next if($genome_found ne $genome);
 			print $ofh ">$transcript_id\n$$sequences{$transcript_id}\n"

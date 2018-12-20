@@ -96,6 +96,9 @@ sub parse_and_join_fasta_to_outfiles {
 # Broad Format = >7000011728610201 gene_id=7000011728610200 locus=None name="flagellum-specific ATP synthase" genome=Esch_coli_MGH121_V1 analysisRun=Esch_coli_MGH121_V1_POSTPRODIGAL_2	
 sub make_broad_style_id_for_fasta {
 	my ($line, $genome) = @_;
+	# Remove carriage returns
+	$line =~ s/\r//g;
+	# Check ID line is not already in Broad format. Then convert into pseudo-Broad format.
 	if(($line =~ m/^>/) && (($line !~ m/gene_id\=/) && ($line !~ m/locus\=/) && ($line !~ m/name\=/) && ($line !~ m/genome\=/) && ($line !~ m/analysisRun\=/))) { 
 		my @id_parts = split / /, $line;
 		my $id = $id_parts[0];
