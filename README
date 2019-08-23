@@ -34,7 +34,8 @@ cd Synima/examples
 perl ../util/Create_full_repo_sequence_databases.pl -r ./Repo_spec.txt
 perl ../util/Blast_grid_all_vs_all.pl -r ./Repo_spec.txt
 perl ../util/Blast_all_vs_all_repo_to_OrthoMCL.pl -r ./Repo_spec.txt
-ALTERNATIVELY: ../util/Blast_all_vs_all_repo_to_RBH.pl -r ./Repo_spec.txt
+ALTERNATIVELY 1: ../util/Blast_all_vs_all_repo_to_RBH.pl -r ./Repo_spec.txt
+ALTERNATIVELY 2: ../util/Blast_all_vs_all_repo_to_Orthofinder.pl -r ./Repo_spec.txt
 perl ../util/Orthologs_to_summary.pl -o all_orthomcl.out
 perl ../util/DAGchainer_from_gene_clusters.pl -r ./Repo_spec.txt \
              -c GENE_CLUSTERS_SUMMARIES.OMCL/GENE_CLUSTERS_SUMMARIES.clusters
@@ -83,6 +84,10 @@ or any other way that is specified explicitly for Create_full_repo_sequence_data
 Gene ID's in the two FASTA files can be a single word i.e. >CBBG_0001 or they 
 can have multiple fields e.g. >01 gene_id=02 locus=03 name="ATPS" 
 genome=Esch_coli analysisRun=Esch_coli_Augustus
+
+Note: Sequences from separate genomes must have distinct names. i.e. if chr1 and gene1 are 
+names in genome1, genome2 should not have any sequences called chr1 and gene1. Otherwise 
+there will be errors later in the pipeline.
 
 The second step is to run all vs all BLAST hits using Blast_grid_all_vs_all.pl.
 Peptide or nucleotide alignments are possible, although peptide is generally recommended.
