@@ -86,8 +86,9 @@ can have multiple fields e.g. >01 gene_id=02 locus=03 name="ATPS"
 genome=Esch_coli analysisRun=Esch_coli_Augustus
 
 Note: Sequences from separate genomes must have distinct names. i.e. if chr1 and gene1 are 
-names in genome1, genome2 should not have any sequences called chr1 and gene1. Otherwise 
-there will be errors later in the pipeline.
+names in genome1, genome2 should not have any sequences called chr1 and gene1. Non-unique
+names causes issues with BLAST resulting in errors later in the pipeline. Gene and contig names 
+should also ideally be alphanumerical, and avoid symbols such as '='.
 
 The second step is to run all vs all BLAST hits using Blast_grid_all_vs_all.pl.
 Peptide or nucleotide alignments are possible, although peptide is generally recommended.
