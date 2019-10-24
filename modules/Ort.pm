@@ -72,8 +72,10 @@ sub read_Orthofinder_Orthogroups_csv_output {
 			#warn "my header line = $line\n";
 			for(my $i=1; $i<(scalar(@bits)); $i++) {
 				my $annotation_name = $bits[$i];
-				die "Error parsing Orthofinder: Expecting the headers (e.g. $annotation_name) in $filename to include .annotation.pep.synima-parsed...\n" if($annotation_name !~ m/\.annotation\.pep\.synima-parsed$/i);
-				$annotation_name =~ s/\.annotation\.pep\.synima-parsed//i;
+				if($annotation_name =~ m/\.annotation\.pep\.synima-parsed$/i) { $annotation_name =~ s/\.annotation\.pep\.synima-parsed//i; } 
+				elsif($annotation_name =~ m/\.annotation\.cds\.synima-parsed$/i) { $annotation_name =~ s/\.annotation\.cds\.synima-parsed//i; } 
+				else { die "Error parsing Orthofinder: Expecting the headers (e.g. $annotation_name) in $filename to include .annotation.[pep|cds].synima-parsed...\n"; }
+
 				#warn "looking for org_name $annotation_name ??\n";
 				my $genome_name = $self->{'org_name'}{$annotation_name}; 
 				die "no genome name for $annotation_name" if($genome_name eq '');

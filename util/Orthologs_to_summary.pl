@@ -20,7 +20,7 @@ my $usage = "Usage: perl $0 -o <ortholog file (E.g. PEP.RBH.OrthoClusters, all_o
 Optional -t Type of clustering (OMCL, RBH, Orthofinder) [OMCL]
          -d Outdir from Blast_all_vs_all_repo_to_OrthoMCL.pl (if used) [OMCL_outdir]
 	 -r Repo Spec [./Repo_spec.txt]
-	 -p Repo Spec Peptide file [./Repo_spec.txt.all.PEP]\n";
+	 -p Repo Spec CDS/PEP file [./Repo_spec.txt.all.PEP]\n";
 our($opt_t, $opt_d, $opt_r, $opt_p, $opt_o);
 getopt('tdrpo');
 if(!defined $opt_t) { $opt_t = 'OMCL'; }
