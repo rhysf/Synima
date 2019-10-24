@@ -131,7 +131,6 @@ sub save_gene_struct_from_gff {
 		die "Error, already stored info for a feature with ID = $id - Check GFF and re-run. ($line)\n" if (exists $genes{$id});
 		$genes{$id} = $struct;
 	}
-	die "end here!\n";
 	return \%genes;
 }
 
