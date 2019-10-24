@@ -47,6 +47,10 @@ sub combine_all_gff3_files_in_repo {
 		open my $fh, '<', $annot_gff3 or die "Error, cannot read $annot_gff3";
 		GFF: while (my $line=<$fh>) {
         		chomp $line;
+
+			# Remove carriage returns
+			$line =~ s/\r//g;
+
 			next GFF if($line =~ m/^$/);
         		next GFF if($line =~ m/^#/);
 			my @cols = split "\t", $line;
@@ -123,11 +127,11 @@ sub save_gene_struct_from_gff {
 		# Include org in the gene identifier name. Also have ID as alias now.
 		my $id = $organism . ":" . $gene;
 		my $struct = &gff_line_make_struct($organism, $contig, $lend, $rend, $end5, $end3, $orient, $id, $id, $source, $type);
-
 		# Check if its already been seen
 		die "Error, already stored info for a feature with ID = $id - Check GFF and re-run. ($line)\n" if (exists $genes{$id});
 		$genes{$id} = $struct;
 	}
+	die "end here!\n";
 	return \%genes;
 }
 
