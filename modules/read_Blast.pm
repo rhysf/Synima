@@ -8,6 +8,7 @@ $VERSION = 0.1;
 @EXPORT = ();
 @EXPORT_OK = qw();
 %EXPORT_TAGS = (DEFAULT => [qw()], ALL =>[qw()]);
+use File::Which;
 use FindBin qw($Bin);
 use lib "$Bin";
 use DataSpecFileParser;
@@ -19,6 +20,16 @@ use Synima;
 sub make_all_vs_all_blast_search_cmds_from_repo {
 	my ($repo_spec, $type, $num_matches, $num_hits, $evalue, $outfile) = @_;
 	my $blast_prog = ($type eq "PEP") ? "blastp" : "blastn";
+
+	# BLAST version
+	my $BLAST_version = "legacy BLAST";
+	my $formatdb_path = which 'formatdb';
+	my $makeblastdb_path = which 'makeblastdb';
+	if($formatdb_path eq '') { 
+		if($makeblastdb_path eq '') { die "Legacy BLAST (formatdb) and BLAST+ (makeblastdb) not found. Make sure one is in your PATH\n"; } 
+		else { $BLAST_version = "BLAST+"; }
+	}
+	warn "Using $BLAST_version...\n";
 
 	# Parse repo spec file
 	my $data_manager = new DataSpecFileParser($repo_spec);
@@ -34,8 +45,8 @@ sub make_all_vs_all_blast_search_cmds_from_repo {
 			my $genomeB_file = $data_manager->get_data_dump_filename($genomeB, $type);
 			$genomeB_file .= ".synima-parsed.$type";
 
-			# make blastable using formatdb
-			&make_genome_blastable_using_formatdb($genomeB_file, $type);
+			# Make blastable
+			&make_genome_blastable($genomeB_file, $type, $BLAST_version);
 
 			# Make output directory and specify outfile
 			my ($genomeA_vs_genomeB_blast_file, $ignore) = &make_outdir_and_output_for_blast($data_manager, $genomeA, $genomeB, $type);
@@ -43,7 +54,9 @@ sub make_all_vs_all_blast_search_cmds_from_repo {
 
 			# Make Blast command
 			my $num_hits = ($genomeA eq $genomeB) ? $num_hits : $num_matches;
-			my $cmd = "blastall -p $blast_prog -i $genomeA_file -d $genomeB_file -m 8 -v $num_hits -b $num_hits -e $evalue > $genomeA_vs_genomeB_blast_file";
+			my $cmd;
+			if($BLAST_version eq 'legacy BLAST') { $cmd = "blastall -p $blast_prog -i $genomeA_file -d $genomeB_file -m 8 -v $num_hits -b $num_hits -e $evalue > $genomeA_vs_genomeB_blast_file"; }
+			else { $cmd = "$blast_prog -query $genomeA_file -db $genomeB_file -outfmt 8 -max_target_seqs $num_hits -evalue $evalue > $genomeA_vs_genomeB_blast_file" }
 			print $blast_cmds_ofh "$cmd\n";
 		}
 	}
@@ -51,16 +64,23 @@ sub make_all_vs_all_blast_search_cmds_from_repo {
 	return @blast_cmds;
 }
 
-sub make_genome_blastable_using_formatdb {
-	my ($genome_file, $type) = @_;
+sub make_genome_blastable {
+	my ($genome_file, $type, $BLAST_version) = @_;
 	my $blastable_index;
 	if($type eq 'PEP') { $blastable_index = "$genome_file.pin"; }
 	else { $blastable_index = "$genome_file.nin"; }
 	unless (-s $blastable_index) {
-		my $blast_cmd = "formatdb -i $genome_file -p ";
-		if($type eq 'PEP') { $blast_cmd .= 'T'; }
-		else { $blast_cmd .= 'F'; }
-		synima::process_cmd($blast_cmd);
+		if($BLAST_version eq 'legacy BLAST') {
+			my $blast_cmd = "formatdb -i $genome_file -p ";
+			if($type eq 'PEP') { $blast_cmd .= 'T'; }
+			else { $blast_cmd .= 'F'; }
+			synima::process_cmd($blast_cmd);
+		} else {
+			my $blast_cmd = "makeblastdb -in $genome_file -dbtype ";
+			if($type eq 'PEP') { $blast_cmd .= 'prot'; }
+			else { $blast_cmd .= 'nucl'; }
+			synima::process_cmd($blast_cmd);
+		}
 	}
 	return;
 }

@@ -33,3 +33,7 @@ inc/
 /MANIFEST.bak
 /pm_to_blib
 /*.zip
+
+# Synima symlinks
+/util/support_scripts/fastme
+/util/support_scripts/mcl

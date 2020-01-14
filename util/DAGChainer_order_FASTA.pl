@@ -3,8 +3,8 @@ use strict;
 use Bio::SeqIO;
 use Getopt::Std;
 use FindBin qw($Bin);
-use lib "$Bin/perl_modules";
-use MutationTools::read_FASTA;
+use lib "$Bin/../modules";
+use read_FASTA;
 
 ### rfarrer@broadinstitute.org
 
