@@ -56,7 +56,7 @@ sub make_all_vs_all_blast_search_cmds_from_repo {
 			my $num_hits = ($genomeA eq $genomeB) ? $num_hits : $num_matches;
 			my $cmd;
 			if($BLAST_version eq 'legacy BLAST') { $cmd = "blastall -p $blast_prog -i $genomeA_file -d $genomeB_file -m 8 -v $num_hits -b $num_hits -e $evalue > $genomeA_vs_genomeB_blast_file"; }
-			else { $cmd = "$blast_prog -query $genomeA_file -db $genomeB_file -outfmt 8 -max_target_seqs $num_hits -evalue $evalue > $genomeA_vs_genomeB_blast_file" }
+			else { $cmd = "$blast_prog -query $genomeA_file -db $genomeB_file -outfmt 6 -max_target_seqs $num_hits -evalue $evalue > $genomeA_vs_genomeB_blast_file" }
 			print $blast_cmds_ofh "$cmd\n";
 		}
 	}
