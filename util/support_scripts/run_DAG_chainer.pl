@@ -426,16 +426,18 @@ sub group_matches_by_orgMolPairs {
 	my ($match_pairs_aref, $feature_ID_to_gene_href) = @_;
 
 	my %orgMolPair_to_matches;
-	foreach my $match_pair (@$match_pairs_aref) {
+	MATCHPAIRS: foreach my $match_pair (@$match_pairs_aref) {
 		my ($accA, $accB) = ($match_pair->{accA}, $match_pair->{accB});
 
 		# no self matches!
-		next if ($accA eq $accB);
+		next MATCHPAIRS if($accA eq $accB);
 
 		my $gene_struct_A = $feature_ID_to_gene_href->{$accA};
 		my $gene_struct_B = $feature_ID_to_gene_href->{$accB};
-		confess "Warning, cannot find a gene feature for [$accA] from dagchainer_rundir hit_pairs and GFF\n" unless ($gene_struct_A);
-		confess "Warning, cannot find a gene feature for [$accB] from dagchainer_rundir hit_pairs and GFF\n" unless ($gene_struct_B);
+		#confess "Warning, cannot find a gene feature for [$accA] from dagchainer_rundir hit_pairs and GFF\n" unless ($gene_struct_A);
+		#confess "Warning, cannot find a gene feature for [$accB] from dagchainer_rundir hit_pairs and GFF\n" unless ($gene_struct_B);
+		next MATCHPAIRS unless ($gene_struct_A);
+		next MATCHPAIRS unless ($gene_struct_B);
 
 		# Matches between two different isoforms of the same gene?  isoform self hits were already excluded on parsing.
 		next if ($gene_struct_A eq $gene_struct_B);
