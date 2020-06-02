@@ -55,6 +55,7 @@ sub combine_all_gff3_files_in_repo {
         		next GFF if($line =~ m/^#/);
 			my @cols = split "\t", $line;
 			my ($source, $type, $gene_info) = ($cols[1], $cols[2], $cols[8]);
+			next GFF if(!defined $type);
 			next GFF unless ($type eq $feature);
 			$cols[1] = $genome;
 

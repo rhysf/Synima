@@ -19,6 +19,9 @@ sub save_one_column {
 	open IN, "<$file" or die "Cannot open $file: $!\n";
 	LIST: while(my $line=<IN>) {
 		chomp $line;
+		next LIST if($line =~ m/^$/);
+		next LIST if($line eq '');
+
 		my @bits = split /\t/, $line;
 		my ($col1) = ($bits[$col1_n]);
 		die "Undefined columns $col1_n: $line\n" if(!defined $col1);
