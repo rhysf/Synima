@@ -158,6 +158,23 @@ sub genes_subset_from_gene_list_from_config {
 	return (\%genes_subset);
 }
 
+sub genes_from_gene_list_from_config_experimental {
+	my ($config_data, $file_name, $genes) = @_;
+
+	# Save genome -> contig > gene id -> start = start
+	$/ = "\n";
+	my %genes_subset;
+	open my $fh, '<', $$config_data{$file_name} or die "Cannot open $$config_data{$file_name} : $!\n";
+	while(my $line=<$fh>) {
+		chomp $line;
+		my @bits = split /\t/, $line;
+		die "$$config_data{$file_name} doesn't have 4 coloumns: $line\n" if(!defined $bits[3]);
+		$genes_subset{$bits[0]}{$bits[1]}{$bits[3]}{$bits[2]} = $bits[2];
+	}
+	return (\%genes_subset);
+}
+
+
 sub genome_to_chromosome_to_length_hash_subset {
 	my $config_data = $_[0];
 	#warn "genome_to_chromosome_to_length_hash_subset...\n";

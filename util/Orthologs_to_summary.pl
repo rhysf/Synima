@@ -438,10 +438,11 @@ sub parse_annot {
 		next unless($type eq "gene");
 
 		# Save gene id, Name and alias from GFF3
-		my ($gene_id)  = ( $info =~ /ID=([\w\W]+?)[;\n]/ );
+		my ($gene_id)  = ( $info =~ /ID=([\w\W\.]+?)[;\n]/ );
 		die "Cannot parse ID info from $info:\n$line\n" if(!defined $gene_id);
 		my ($name) = ( $info =~ /Name=([\w\W]+?)[;\n]/ );
-		die "Cannot parse name info from $info on $line\n" if(!defined $name);
+		if(!defined $name) { $name = "hypothetical protein"; }
+		#die "Cannot parse name info from $info on $line\n" if(!defined $name);
 		my ($alias) = ( $info =~ /Alias=([\w\W]+?)[;\n]/ );
 		my $locus;
 		if (defined $alias) {	

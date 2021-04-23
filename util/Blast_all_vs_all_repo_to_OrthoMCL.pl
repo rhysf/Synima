@@ -50,7 +50,7 @@ my $cmd = "$m8_to_orthomcl $blast_pairs_gcoded 4 $opt_o/omcl_in";
 synima::process_cmd($cmd);
 
 # Run orthomcl
-$cmd = "$OrthoMCL --mode 4 --bpo_file $opt_o/omcl_in.bpo --gg_file $opt_o/omcl_in.gg 2>&1 | tee $opt_o/omcl.log";
+$cmd = "perl $OrthoMCL --mode 4 --bpo_file $opt_o/omcl_in.bpo --gg_file $opt_o/omcl_in.gg 2>&1 | tee $opt_o/omcl.log";
 synima::process_cmd($cmd);
 
 # Move results from OrthoMCL directory to CWD
