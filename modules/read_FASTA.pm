@@ -12,6 +12,25 @@ $VERSION = 0.1;
 
 ### rfarrer@broadinstitute.org
 
+sub fasta_to_struct {
+	my $input = $_[0];
+	my %struct;
+	$struct{'filename'} = $input;
+	warn "fasta_to_struct: saving from $input...\n";
+	my $inseq = Bio::SeqIO->new('-file' => "<$input",'-format' => 'fasta');
+	while (my $seq_obj = $inseq->next_seq) { 
+		my $id = $seq_obj->id;
+		my $seq = $seq_obj->seq;
+		my $desc = $seq_obj->description;
+
+		# Save
+		$struct{'seq'}{$id} = $seq;
+		$struct{'desc'}{$id} = $desc;
+		push @{$struct{'order'}}, $id;
+	}
+	return \%struct;
+}
+
 sub fasta_id_to_seq_hash {
 	my $input = $_[0];
 	my (%sequences, %descriptions);
@@ -153,21 +172,23 @@ sub split_fasta_seq_dictionary_by_species {
 	# Input seq dictionary
 	my $input = "$repo_spec.all.$type";
 	die "Cannot find $input. Re-run Create_full_repo_sequence_databases.pl\n" if(! -e $input);
-	my ($sequences, $descriptions, $order) = &fasta_id_to_seq_hash($input);
+	my $fasta = fastafile::fasta_to_struct($input);
 
 	# Split seq dictionary by genomes
 	warn "Splitting seq dictionary for blasting...\n";
-	foreach my $genome (@genomes) {
+	foreach my $genome(@genomes) {
 		my $output_file = $data_manager->get_data_dump_filename($genome, $type);
 		$output_file .= ".synima-parsed.$type";
 		warn "$genome = $output_file...\n";
+
+		# Print synima-parsed.CDS/PEP files with updated ids
 		open my $ofh, '>', $output_file or die "Cannot open output file $output_file : $!\n";
-		foreach my $transcript_id(keys %{$sequences}) {
+		foreach my $transcript_id(keys %{$$fasta{'seq'}}) {
 			my $id_line = ">$transcript_id";
-			if(defined $$descriptions{$transcript_id}) { $id_line .= " $$descriptions{$transcript_id}"; }
+			if(defined $$fasta{'desc'}{$transcript_id}) { $id_line .= " $$fasta{'desc'}{$transcript_id}"; }
 			my ($transcript_id, $gene_id, $locus_name, $func_annot, $genome_found, $analysis) = &parse_protein_file_line($id_line);
 			next if($genome_found ne $genome);
-			print $ofh ">$transcript_id\n$$sequences{$transcript_id}\n"
+			print $ofh ">$transcript_id\n$$fasta{'seq'}{$transcript_id}\n";
 		}
 		close $ofh;
 	}
