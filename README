@@ -95,7 +95,8 @@ Peptide or nucleotide alignments are possible, although peptide is generally rec
 This step can take a long time, and therefore, the option of distributing jobs 
 to a cluster via LSF, SGE and UGE is provided (if available). This step will 
 create folders in each of the genome folders called RBH_blast_[PEP/CDS]. This 
-step requires BLAST legacy (formatdb and blastall) to be in $PATH.
+step requires BLAST+ (makeblastdb and blastn/p) or BLAST legacy (formatdb and blastall) 
+to be in $PATH.
 
 The third step is to run OrthoMCL or reciprocal best hits (RBH) on the BLAST output 
 using Blast_all_vs_all_repo_to_OrthoMCL.pl or Blast_all_vs_all_repo_to_RBH.pl 
@@ -151,7 +152,9 @@ Optional:   -t Type of alignment. Can be either PEP (peptide) or CDS (Coding seq
             -g Run commands on the grid (y/n) [n]
             -p Platform (UGER, LSF, GridEngine) [UGER]
             -q Queue name [short]
-Notes:      BLAST legacy tools formatdb and blastall are needed in $PATH
+Notes:      Blast needs to be in PATH. 
+            If BLAST+ (formatdb and blastn/p) is in PATH, that will be used. 
+            Otherwise, BLAST legacy (formatdb and blastall) needs to be in PATH.
 
 Blast_all_vs_all_repo_to_OrthoMCL.pl 
 Parameters: -r ./Repo_spec.txt []
