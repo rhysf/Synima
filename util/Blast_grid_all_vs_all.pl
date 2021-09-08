@@ -20,7 +20,9 @@ Optional: -t Type of alignment (PEP/CDS) [PEP]
 	  -g Run commands on the grid (y/n) [n]
 	  -p Platform (UGER, LSF, GridEngine) [UGER]
 	  -q Queue name [short]\n
-Note: BLAST legacy (formatdb and blastall) need to be in PATH (use BLAST)\n";
+Note: Blast needs to be in PATH. 
+      If BLAST+ (formatdb and blastn/p) is in PATH, that will be used. 
+      Otherwise, BLAST legacy (formatdb and blastall) needs to be in PATH.\n";
 our($opt_r, $opt_t, $opt_c, $opt_s, $opt_e, $opt_o, $opt_g, $opt_p, $opt_q);
 getopt('rtcseogpq');
 die $usage unless($opt_r);
