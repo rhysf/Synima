@@ -85,6 +85,9 @@ Gene ID's in the two FASTA files can be a single word i.e. >CBBG_0001 or they
 can have multiple fields e.g. >01 gene_id=02 locus=03 name="ATPS" 
 genome=Esch_coli analysisRun=Esch_coli_Augustus
 
+If your files are downloaded from Ensembl, then utility scripts Ensembl_feature_table_to_gff.pl
+and Ensembl_reformat_fasta.pl may help parsing into the correct formats.
+
 Note: Sequences from separate genomes must have distinct names. i.e. if chr1 and gene1 are 
 names in genome1, genome2 should not have any sequences called chr1 and gene1. Non-unique
 names causes issues with BLAST resulting in errors later in the pipeline. Gene and contig names 
@@ -194,6 +197,14 @@ Optional:   -z File containing a list of genomes to restrict the analysis to []
 	    -v Verbose (y/n) [n]
 Notes:      GFF specifications (-f, -s, -d, -m) need to be the same as specified during 
             Blast_all_vs_all_repo_to_OrthoMCL.pl or Blast_all_vs_all_repo_to_RBH.pl";
+
+Ensembl_feature_table_to_gff.pl
+Parameters: Feature table
+Output: GFF
+
+Ensembl_reformat_fasta.pl
+Parameters: FASTA (coding sequence/cds)
+Output: FASTA
 
 SynIma.pl
 Parameters: -c	./Config.txt [$cwd/SynIma-output/config.txt]
