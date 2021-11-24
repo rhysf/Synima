@@ -113,18 +113,18 @@ sub make_broad_style_id_for_fasta {
 			# ID
 			if($i eq 0) { 
 				my @id_parts2 = split />/, $id_part;
-				$id = $id_parts[1];
+				$id = $id_parts2[1];
 				$new_line = $id_part; 
 			}
 			# Gene id
 			elsif($i eq 1) {
 				if($id_part =~ m/gene_id\=/) { $new_line .= " $id_part"; }
-				else { $new_line .= " gene_id=$id_part"; }
+				else { $new_line .= " gene_id=$id"; }
 			}
 			# Locus
 			elsif($i eq 2) {
 				if($id_part =~ m/locus\=/) { $new_line .= " $id_part"; }
-				else { $new_line .= " locus=$id_part"; }
+				else { $new_line .= " locus=$id"; }
 			}
 			# Name
 			elsif($i eq 3) {
