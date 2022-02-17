@@ -46,7 +46,7 @@ $genome_to_code = &assign_genome_codes($genome_to_code, $genome_codes_out);
 &write_gcoded_m8_and_sort($trans_id_to_genome, $genome_to_code, $all_blast_pairs, $blast_pairs_gcoded);
 
 # Convert m8 format to orthomcl input format
-my $cmd = "$m8_to_orthomcl $blast_pairs_gcoded 4 $opt_o/omcl_in";
+my $cmd = "perl $m8_to_orthomcl $blast_pairs_gcoded 4 $opt_o/omcl_in";
 synima::process_cmd($cmd);
 
 # Run orthomcl
