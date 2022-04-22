@@ -81,7 +81,7 @@ foreach my $type(qw(PEP CDS)) {
 
 	warn "\n\n\n$found / $total found (GFF entries in $fasta)\n";
 	warn "$found2 / $total2 found ($fasta entries in GFF)\n";
-	if($found eq $total) { warn "$fasta and $all_annotations repository sequence databases are correctly formatted.\n"; }
+	if(($found eq $total) && ($found2 eq $total2)) { warn "$fasta and $all_annotations repository sequence databases are correctly formatted.\n"; }
 	else { warn "WARNING: $fasta and $all_annotations repository sequence databases are not correctly formatted. Change settings and re-run, or rename ID's in FASTA or GFF to match. Use -v for further info.\n"; }
 }
 warn "Finished check.\n";
