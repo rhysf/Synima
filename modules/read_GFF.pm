@@ -62,10 +62,10 @@ sub combine_all_gff3_files_in_repo {
 			# Find parent
 			my @description_parts = split /$desc_seperator/, $gene_info;
 			my $feature_parents = $description_parts[$desc_column];
-			if($count eq 0) { warn "trying to remove $desc_replace\n"; }
+			if($count eq 0) { warn "combine_all_gff3_files_in_repo: removing $desc_replace from IDs for $genome...\n"; }
 			$feature_parents =~ s/$desc_replace//g;
 			if($count eq 0) { 
-				warn "$genome: Saving IDs (e.g. $feature_parents). If fail, check settings for matching FASTA and GFFs...\n"; 
+				warn "combine_all_gff3_files_in_repo: Saving IDs (e.g. $feature_parents) for $genome...\n"; 
 				$count = 1; 
 			}
 
@@ -75,8 +75,8 @@ sub combine_all_gff3_files_in_repo {
 			$count++;
 		}
 		close $fh;
-		die "Found no $feature features in $annot_gff3. Check and re-run\n" if($count eq 0);
-		warn "Found $count $feature features in $annot_gff3\n";
+		die "Error: Found no $feature features in $annot_gff3. Check and re-run\n" if($count eq 0);
+		warn "combine_all_gff3_files_in_repo: Found $count $feature features in $annot_gff3\n";
 	}
 	close $ofh;
 	return 1;

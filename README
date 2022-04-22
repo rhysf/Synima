@@ -143,6 +143,7 @@ Optional:   -f Feature wanted from GFF [mRNA]
 	    -s Seperator in GFF description for gene names (\" ; etc) [;]
 	    -d GFF description part number with the parent/gene info [0]
 	    -m Remove additional comments in column [Parent=]
+	    -v Verbose mode (report IDs missing) (y/n) [n]
 Notes:      Will copy all transcripts and specified features from GFF into primary fasta files
 
 Blast_grid_all_vs_all.pl

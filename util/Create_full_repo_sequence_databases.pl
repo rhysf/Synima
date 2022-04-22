@@ -18,15 +18,17 @@ Optional: -f Feature wanted from GFF [mRNA]
 	  -s Seperator in GFF description for gene names (\" ; etc) [;]
 	  -d GFF description part number with the parent/gene info [0]
 	  -m Remove additional comments in column [ID=]
+	  -v Verbose mode (report IDs missing) (y/n) [n]
 Notes: Will copy all transcripts and specified features from GFF into primary fasta files\n";
-our($opt_r, $opt_f, $opt_s, $opt_d, $opt_m);
-getopt('rfsdm');
+our($opt_d, $opt_f, $opt_r, $opt_s, $opt_m, $opt_v);
+getopt('dfrsmv');
 die $usage unless ($opt_r);
 die "Cannot open $opt_r : $!\n" unless (-e $opt_r);
+if(!defined $opt_d) { $opt_d = 0; }
 if(!defined $opt_f) { $opt_f = 'mRNA'; }
 if(!defined $opt_s) { $opt_s = ';'; }
-if(!defined $opt_d) { $opt_d = 0; }
 if(!defined $opt_m) { $opt_m = 'ID='; }
+if(!defined $opt_v) { $opt_v = 'n'; }
 
 # Perform data retrievals
 my $data_manager = new DataSpecFileParser($opt_r);
@@ -49,19 +51,40 @@ foreach my $type(qw(PEP CDS)) {
 	my $fasta = "$opt_r.all.$type";
 	my ($sequences, $descriptions, $order) = fastafile::fasta_id_to_seq_hash($fasta);
 	my ($gff, $strand) = gfffile::gff_to_contig_parent_to_cds_hash($all_annotations);
+
+	# Looping through every GFF entry and looking for corresponding FASTA entries
+	my %genes_in_GFF;
 	my ($found, $not_found, $total) = (0, 0, 0);
 	foreach my $contig(keys %{$gff}) {
 		foreach my $parent(keys %{$$gff{$contig}}) {
+			$genes_in_GFF{$parent} = 1;
 			if(defined $$sequences{$parent}) { $found++; }
-			else { $not_found++; }
+			else { 
+				$not_found++; 
+				if($opt_v ne 'n') { warn "WARNING: No gene $parent from GFF found in FASTA\n"; }
+			}
 		}
 	}
 	$total = ($found + $not_found);
-	warn "\n\n\n$found / $total found\n";
+
+	# Looping through every FASTA entry and looking for corresponding GFF entries
+	my ($found2, $not_found2, $total2) = (0, 0, 0);
+	foreach my $gene(keys %{$sequences}) {
+		if(defined $genes_in_GFF{$gene}) { $found2++; }
+		else {
+			$not_found2++;
+			if($opt_v ne 'n') { warn "WARNING: No gene $gene from FASTA found in GFF\n"; }
+		}
+
+	}
+	$total2 = ($found2 + $not_found2);
+
+	warn "\n\n\n$found / $total found (GFF entries in $fasta)\n";
+	warn "$found2 / $total2 found ($fasta entries in GFF)\n";
 	if($found eq $total) { warn "$fasta and $all_annotations repository sequence databases are correctly formatted.\n"; }
-	else { warn "$fasta and $all_annotations repository sequence databases are not correctly formatted. Change settings and re-run, or rename ID's in FASTA or GFF to match.\n"; }
+	else { warn "WARNING: $fasta and $all_annotations repository sequence databases are not correctly formatted. Change settings and re-run, or rename ID's in FASTA or GFF to match. Use -v for further info.\n"; }
 }
-warn "Finished.\n";
+warn "Finished check.\n";
 
 sub create_full_repo_sequence_databases {
 	my ($data_manager, $genomes_aref, $repo) = @_;
