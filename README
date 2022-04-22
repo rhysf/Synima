@@ -2,12 +2,11 @@ All documentation for Synima can be found at:
 
 https://github.com/rhysf/Synima
 
-Synima (Synteny Imager) is a program for visualising syntenic regions from 
-orthologous genes, infered by reciprocal best hits (RBH) from BLAST, or 
-OrthoMCL or Orthofinder, followed by DAGchainer. OrthoMCL, Orthofinder and 
-DAGchainer are bundled with Synima, with wrapper scripts provided in /util/. 
-Several scripts launch several jobs that can be run on a grid (LSF, 
-GridEngine, UGER are supported).
+Synima (Synteny Imager) is an orthology prediction pipeline and synteny viewer. 
+Orthologous genes are infered by either reciprocal best hits (RBH) from BLAST,  
+OrthoMCL or Orthofinder. Synteny is determined using DAGchainer. OrthoMCL, Orthofinder,  
+and DAGchainer are bundled with Synima, with wrapper scripts provided in /util/. 
+Several scripts can optionally launch in parallel  via LSF, GridEngine or UGER.
 
 Prerequisites:
 --------------
