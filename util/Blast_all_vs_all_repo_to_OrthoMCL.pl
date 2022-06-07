@@ -26,13 +26,14 @@ die "-t needs to be PEP or CDS: $opt_t\n" unless ($opt_t =~ m/^(PEP|CDS)$/);
 # Scripts needed
 my $m8_to_orthomcl = "$Bin/support_scripts/Blast_m8_to_OrthoMCL_gg_and_bpo_input.pl";
 my $OrthoMCL = "$Bin/support_scripts/OrthoMCL.pl";
-foreach($m8_to_orthomcl, $OrthoMCL){ die "Cannot find $_ : $!\n" unless(-e $_); }
+foreach($m8_to_orthomcl, $OrthoMCL) { die "Cannot find $_ : $!\n" unless(-e $_); }
 
 # Input
 my $all_annotations = "$opt_r.all.GFF3";
 
 # Output directory and files
-`mkdir $opt_o`;
+if(! -d $opt_o) { `mkdir $opt_o`; }
+else { die "ERROR: folder $opt_o already exists. Delete first.\n"; }
 my $all_blast_pairs = "$opt_o/all_blast_pairs.m8";
 my $genome_codes_out = "$opt_o/for_omcl.genome_codes";
 my $blast_pairs_gcoded = "$opt_o/for_omcl.Gcoded.m8";
@@ -120,7 +121,7 @@ sub assign_genome_codes {
 	my $counter = 0;
 	warn "Assigning genome codes...\n";
 	open my $ofh, '>', $outfile or die "Error, cannot write to $outfile : $!\n";
-	foreach my $genome (keys %{$genome_to_code}) {
+	foreach my $genome (sort keys %{$genome_to_code}) {
 		$counter++;
 		my $code = sprintf("G%03x", $counter);
 		$$genome_to_code{$genome} = $code;
