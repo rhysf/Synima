@@ -49,12 +49,12 @@ sub combine_all_gff3_files_in_repo {
 
 		# open GFF for each genome:
 		my %ids_in_one_genome;
-        my $count = 0;
-        my $change_id_count = 0;
-        my $duplicate_id_count = 0;
+		my $count = 0;
+		my $change_id_count = 0;
+		my $duplicate_id_count = 0;
 		my $annot_gff3 = $data_manager->get_data_dump_filename($genome, "Annotation");
 		warn "Combine_all_gff3_files_in_repo: opening $annot_gff3\n";
-        die "Error, cannot find $annot_gff3" unless (-s $annot_gff3);
+		die "Error, cannot find $annot_gff3" unless (-s $annot_gff3);
 		open my $fh, '<', $annot_gff3 or die "Error, cannot read $annot_gff3";
 		GFF: while (my $line=<$fh>) {
         	chomp $line;
@@ -64,7 +64,7 @@ sub combine_all_gff3_files_in_repo {
 
 			# Find features of interest
 			next GFF if($line =~ m/^$/);
-        	next GFF if($line =~ m/^#/);
+			next GFF if($line =~ m/^#/);
 			my @cols = split "\t", $line;
 			my ($source, $type, $gene_info) = ($cols[1], $cols[2], $cols[8]);
 			next GFF if(!defined $type);
@@ -109,7 +109,7 @@ sub combine_all_gff3_files_in_repo {
 			# Print
 			$cols[8] = $feature_parents;
 			my $new_line = join "\t", @cols;
-            print $ofh "$new_line\n";
+			print $ofh "$new_line\n";
 			$count++;
 		}
 		close $fh;
