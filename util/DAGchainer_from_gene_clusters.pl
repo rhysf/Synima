@@ -74,7 +74,9 @@ if($opt_g eq 'y') {
 	warn "Running DAGchainer commands on grid...\n";
 	my $run_grid_cmd = "$Run_Commands_python --platform $opt_p --queue $opt_q --mem 4 --throttle_nodes 99 --cmds_per_node 1 $opt_l";
 	synima::process_cmd($run_grid_cmd);
-} else {
+} 
+# Run commands locally
+else {
 	warn "Running DAGchainer commands...\n";
 	foreach(@cmd_list) { system($_); }
 }

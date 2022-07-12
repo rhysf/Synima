@@ -19,8 +19,8 @@ die $usage unless ($opt_a && $opt_b && $opt_s);
 my ($order1, $isolate1) = &save_order($opt_a);
 my $fasta_order2;
 if(defined $opt_f) { 
-	my ($sequences, $descriptions, $order) = fastafile::fasta_id_to_seq_hash($opt_f);
-	$fasta_order2 = $order;
+	my $sequences = fastafile::fasta_to struct($opt_f);
+	$fasta_order2 = \@{$$sequences{'order'}};
 }
 
 # find matches

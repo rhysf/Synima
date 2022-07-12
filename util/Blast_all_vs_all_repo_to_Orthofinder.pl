@@ -81,11 +81,11 @@ sub assign_sequence_IDs_and_save_FASTA {
 
 		# Save FASTA
 		my $seq_counter = 0;
-		my ($sequences, $descriptions, $order) = fastafile::fasta_id_to_seq_hash($fasta);
+		my $sequences = fastafile::fasta_to_struct($fasta);
 		my $outfile2 = "$outfolder/Species$code.fa";
 		open my $ofh2, '>', $outfile2 or die "Cannot open outfile $outfile2 : $!\n";
-		foreach my $id(keys %{$sequences}) {
-			my $seq = $$sequences{$id};
+		foreach my $id(keys %{$$sequences{'seq'}}) {
+			my $seq = $$sequences{'seq'}{$id};
 			my $new_id = "$code\_$seq_counter";
 			#warn "new id = $new_id and seq = $seq\n";
 			print $ofh "$new_id: $id\n";

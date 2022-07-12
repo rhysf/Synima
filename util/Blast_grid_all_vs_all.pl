@@ -13,13 +13,13 @@ use Synima;
 # Opening commands
 my $usage = "Usage: perl $0 -r <Repo_spec>
 Optional: -t Type of alignment (PEP/CDS) [PEP]
-          -c Number of best matches to capture between species [5]   # only single best hit
-	  -s Number of top hits to capture in self-searches for paralogs [1000]  
-	  -e E-value cutoff [1e-20]
-	  -o Blast cmds outfile [blast.\$type.cmds]
-	  -g Run commands on the grid (y/n) [n]
-	  -p Platform (UGER, LSF, GridEngine) [UGER]
-	  -q Queue name [short]\n
+          -c Number of best matches to capture between species [5] # only single best hit
+          -s Number of top hits to capture in self-searches for paralogs [1000]  
+          -e E-value cutoff [1e-20]
+          -o Blast cmds outfile [blast.\$type.cmds]
+          -g Run commands on the grid (y/n) [n]
+          -p Platform (UGER, LSF, GridEngine) [UGER]
+          -q Queue name [short]\n
 Note: Blast needs to be in PATH. 
       If BLAST+ (formatdb and blastn/p) is in PATH, that will be used. 
       Otherwise, BLAST legacy (formatdb and blastall) needs to be in PATH.\n";
@@ -35,7 +35,7 @@ if(!defined $opt_g) { $opt_g = 'n'; }
 if(!defined $opt_p) { $opt_p = 'UGER'; }
 if(!defined $opt_q) { $opt_q = 'short'; }
 die "Cannot open $opt_r : $!\n" unless(-e $opt_r);
-die "-g is not n, N, y or Y: $opt_g\n" if($opt_g !~ m/^(n|N|y|Y)$/);
+die "-g is not n or y: $opt_g\n" if($opt_g !~ m/^(n|y)$/i);
 die "-t is not PEP or CDS: $opt_t\n" if($opt_t !~ m/^(PEP|CDS)$/);
 die "-p is not UGER, LSF or GridEngine: $opt_p\n" if($opt_p !~ m/^(UGER|LSF|GridEngine)$/);
 

@@ -37,22 +37,34 @@ sub combine_all_gff3_files_in_repo {
 	my $data_manager = new DataSpecFileParser($repo_spec);
 	my @genomes = $data_manager->get_genome_list();
 
+	# Unique transcript ids needed
+	my %unique_transcript_ids;
+	my %new_transcript_ids;
+
+	# Combine all GFFs
 	warn "Combine_all_gff3_files_in_repo: printing to $output\n";
 	die "$output already exists. Delete then re-run\n" if(-e $output);
 	open my $ofh, '>>', $output or die "Error, cannot open file $output\n";
 	foreach my $genome (@genomes) {
-        	my $count = 0;
+
+		# open GFF for each genome:
+		my %ids_in_one_genome;
+        my $count = 0;
+        my $change_id_count = 0;
+        my $duplicate_id_count = 0;
 		my $annot_gff3 = $data_manager->get_data_dump_filename($genome, "Annotation");
-        	die "Error, cannot find $annot_gff3" unless (-s $annot_gff3);
+		warn "Combine_all_gff3_files_in_repo: opening $annot_gff3\n";
+        die "Error, cannot find $annot_gff3" unless (-s $annot_gff3);
 		open my $fh, '<', $annot_gff3 or die "Error, cannot read $annot_gff3";
 		GFF: while (my $line=<$fh>) {
-        		chomp $line;
+        	chomp $line;
 
 			# Remove carriage returns
 			$line =~ s/\r//g;
 
+			# Find features of interest
 			next GFF if($line =~ m/^$/);
-        		next GFF if($line =~ m/^#/);
+        	next GFF if($line =~ m/^#/);
 			my @cols = split "\t", $line;
 			my ($source, $type, $gene_info) = ($cols[1], $cols[2], $cols[8]);
 			next GFF if(!defined $type);
@@ -64,22 +76,48 @@ sub combine_all_gff3_files_in_repo {
 			my $feature_parents = $description_parts[$desc_column];
 			if($count eq 0) { warn "combine_all_gff3_files_in_repo: removing $desc_replace from IDs for $genome...\n"; }
 			$feature_parents =~ s/$desc_replace//g;
-			if($count eq 0) { 
-				warn "combine_all_gff3_files_in_repo: Saving IDs (e.g. $feature_parents) for $genome...\n"; 
-				$count = 1; 
-			}
+			if($count eq 0) { warn "combine_all_gff3_files_in_repo: saving IDs (e.g. $feature_parents) for $genome...\n"; }
 
+			# Check for duplicate features in same genome
+			if(defined $ids_in_one_genome{$feature_parents}) {
+				if($duplicate_id_count eq 0) { warn "combine_all_gff3_files_in_repo: found duplicate IDs in same genome. Excluding duplicates.\n"; }
+				$duplicate_id_count = 1;
+				next GFF;
+			}
+			$ids_in_one_genome{$feature_parents} = 1;
+
+			# Check for unique transcript IDs
+			if(defined $unique_transcript_ids{$feature_parents}) {
+
+				# warn
+				if($change_id_count eq 0) {
+					warn "combine_all_gff3_files_in_repo: found IDs multiple times, so generating unique IDs\n";
+					$change_id_count=1;
+				}
+
+				# Make a new ID
+				my $new_transcript_id = $feature_parents . '_synima_' . time();
+				while(defined $unique_transcript_ids{$new_transcript_id}) {
+					$new_transcript_id = $feature_parents . '_synima_' . time();
+				}
+				$new_transcript_ids{$genome}{'old_to_new'}{$feature_parents} = $new_transcript_id;
+				#$new_transcript_ids{$genome}{'new_to_old'}{$new_transcript_id} = $feature_parents;
+				$feature_parents = $new_transcript_id;
+			}
+			$unique_transcript_ids{$feature_parents} = 1;
+
+			# Print
 			$cols[8] = $feature_parents;
 			my $new_line = join "\t", @cols;
-            		print $ofh "$new_line\n";
+            print $ofh "$new_line\n";
 			$count++;
 		}
 		close $fh;
 		die "Error: Found no $feature features in $annot_gff3. Check and re-run\n" if($count eq 0);
-		warn "combine_all_gff3_files_in_repo: Found $count $feature features in $annot_gff3\n";
+		warn "combine_all_gff3_files_in_repo: found $count $feature features in $annot_gff3\n";
 	}
 	close $ofh;
-	return 1;
+	return \%new_transcript_ids;
 }
 
 sub save_genome_codes_from_synima_parsed_gff3 {

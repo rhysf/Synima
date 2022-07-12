@@ -230,14 +230,14 @@ sub get_gene_annotations {
 
 		# Save sequences
 		my $peptide_file = $data_manager->get_data_dump_filename($genome, 'PEP');
-		my ($sequences, $descriptions, $order) = fastafile::fasta_id_to_seq_hash($peptide_file);
-		foreach my $id(keys %{$sequences}) {
+		my $sequences = fastafile::fasta_to_struct($peptide_file);
+		foreach my $id(keys %{$$sequences{'seq'}}) {
 			my $struct = { 
 				gene_id => $id,
 				trans_id => $id,
 				genome => $genome,
 				locus => $id,
-				name => $$descriptions{$id},
+				name => $$sequences{'desc'}{$id},
 			};
 			$annot_id_to_annotations{$id} = $struct;
 		}

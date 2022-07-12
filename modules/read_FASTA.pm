@@ -31,23 +31,6 @@ sub fasta_to_struct {
 	return \%struct;
 }
 
-sub fasta_id_to_seq_hash {
-	my $input = $_[0];
-	my (%sequences, %descriptions);
-	my @order;
-	warn "fasta_id_to_seq_hash: saving sequences from $input...\n";
-	my $inseq = Bio::SeqIO->new('-file' => "<$input",'-format' => 'fasta');
-	while (my $seq_obj = $inseq->next_seq) { 
-		my $id = $seq_obj->id;
-		my $seq = $seq_obj->seq;
-		my $desc = $seq_obj->description;
-		$sequences{$id}=$seq;
-		$descriptions{$id}=$desc;
-		push @order, $id;
-	}
-	return (\%sequences, \%descriptions, \@order);
-}
-
 sub fasta_id_to_seq_length_hash {
 	my $input = $_[0];
 	my (%lengths);
@@ -55,7 +38,7 @@ sub fasta_id_to_seq_length_hash {
 	my $inseq = Bio::SeqIO->new('-file' => "<$input",'-format' => 'fasta');
 	while (my $seq_obj = $inseq->next_seq) { 
 		my $id = $seq_obj->id;
-    		my $seq = $seq_obj->seq;
+    	my $seq = $seq_obj->seq;
 		my $length = length($seq);
 		$lengths{$id} = $length;
 	}
@@ -68,7 +51,7 @@ sub fasta_to_total_seq_length {
 	warn "fasta_to_total_seq_length: saving sequences from $input...\n";
 	my $inseq = Bio::SeqIO->new('-file' => "<$input",'-format' => 'fasta');
 	while (my $seq_obj = $inseq->next_seq) { 
-    		my $seq = $seq_obj->seq;
+    	my $seq = $seq_obj->seq;
 		$lengths += length($seq);
 	}
 	return ($lengths);
@@ -103,49 +86,6 @@ sub fasta_broad_format_to_struct {
 	return \%all_proteins;
 }
 
-#Broad Format = >7000011728610201 gene_id=7000011728610200 locus=None name="flagellum-specific ATP synthase" genome=Esch_coli_MGH121_V1 analysisRun=Esch_coli_MGH121_V1_POSTPRODIGAL_2	
-sub parse_protein_file_line {
-	my $line =  shift @_;
-	my @cols = split " ", $line;
-
-	my $transcript_id = shift @cols;	 	
-	die "Error:Unable to parse line $line from proteins file. Transcript_id not defined.\n" if(!defined $transcript_id);
-	$transcript_id =~ s/^>//;
-
-	my $gene_id = shift @cols;
-	die "Error:Unable to parse line $line from proteins file. Gene_id not defined.\n"  if(!defined $gene_id);
-	$gene_id =~ s/gene_id=//;
-	
-	my $locus_name = shift @cols;
-	die "Error:Unable to parse line $line from proteins file. Locus name not defined.\n"  if(!defined $locus_name);
-	$locus_name =~ s/locus=//;
-
-	my $func_annot = '';
-	my $index = 0;
-	while($index < scalar(@cols)) {
-		$func_annot .= $cols[$index] . " ";
-		$index++;
-		#warn "index = $index, func_annot = $func_annot\n";
-		#last if($func_annot =~ /^name=""/);
-		last if($func_annot =~ /^name="[\w\W]+" $/);
-	}
-
-	# If we got to the end of the line...
-	die "Error:Unable to parse line $line from proteins file\n" if ($index - 1 ) == scalar(@cols);
-
-	$func_annot =~ s/name="//g;
-	$func_annot =~ s/" //g;
-
-	my $genome = $cols[$index];
-	die "Unable to find genome in $line at index $index\n" if(!defined $genome);
-	$index++;	
-	$genome =~ s/genome=//;
-
-	my $analysis = $cols[$index];
-	$analysis =~ s/analysisRun=//;
-	return ($transcript_id, $gene_id, $locus_name, $func_annot, $genome, $analysis);
-}
-
 sub create_transcript_functinal_annotation_map {
 	my ($file_in, $file_out) = @_;
 	open my $fh, '<', $file_in or die "Unable to open file $file_in : $!\n";
@@ -175,24 +115,78 @@ sub split_fasta_seq_dictionary_by_species {
 	my $fasta = fastafile::fasta_to_struct($input);
 
 	# Split seq dictionary by genomes
-	warn "Splitting seq dictionary for blasting...\n";
+	warn "split_fasta_seq_dictionary_by_species: split $input\n";
 	foreach my $genome(@genomes) {
+
+		# Outfile
+		my $count = 0;
 		my $output_file = $data_manager->get_data_dump_filename($genome, $type);
 		$output_file .= ".synima-parsed.$type";
-		warn "$genome = $output_file...\n";
+		warn "split_fasta_seq_dictionary_by_species: splitting $genome -> $output_file...\n";
 
 		# Print synima-parsed.CDS/PEP files with updated ids
 		open my $ofh, '>', $output_file or die "Cannot open output file $output_file : $!\n";
 		foreach my $transcript_id(keys %{$$fasta{'seq'}}) {
+
+			# gene/protein ID
 			my $id_line = ">$transcript_id";
 			if(defined $$fasta{'desc'}{$transcript_id}) { $id_line .= " $$fasta{'desc'}{$transcript_id}"; }
+
+			# gene/protein sequence
 			my ($transcript_id, $gene_id, $locus_name, $func_annot, $genome_found, $analysis) = &parse_protein_file_line($id_line);
 			next if($genome_found ne $genome);
+			$count++;
 			print $ofh ">$transcript_id\n$$fasta{'seq'}{$transcript_id}\n";
 		}
 		close $ofh;
+		warn "split_fasta_seq_dictionary_by_species: $count printed for $genome\n";
 	}
 	return 1;
+}
+
+### local sub routines
+
+#Broad Format = >7000011728610201 gene_id=7000011728610200 locus=None name="flagellum-specific ATP synthase" genome=Esch_coli_MGH121_V1 analysisRun=Esch_coli_MGH121_V1_POSTPRODIGAL_2	
+sub parse_protein_file_line {
+	my $line =  shift @_;
+	my @cols = split " ", $line;
+
+	my $transcript_id = shift @cols;	 	
+	die "Error:Unable to parse line $line from proteins file. Transcript_id not defined.\n" if(!defined $transcript_id);
+	$transcript_id =~ s/^>//;
+
+	my $gene_id = shift @cols;
+	die "Error:Unable to parse line $line from proteins file. Gene_id not defined.\n" if(!defined $gene_id);
+	$gene_id =~ s/gene_id=//;
+	
+	my $locus_name = shift @cols;
+	die "Error:Unable to parse line $line from proteins file. Locus name not defined.\n" if(!defined $locus_name);
+	$locus_name =~ s/locus=//;
+
+	my $func_annot = '';
+	my $index = 0;
+	while($index < scalar(@cols)) {
+		$func_annot .= $cols[$index] . " ";
+		$index++;
+		#warn "index = $index, func_annot = $func_annot\n";
+		#last if($func_annot =~ /^name=""/);
+		last if($func_annot =~ /^name="[\w\W]+" $/);
+	}
+
+	# If we got to the end of the line...
+	die "parse_protein_file_line: Error: Unable to parse line $line from proteins file\n" if ($index - 1 ) == scalar(@cols);
+
+	$func_annot =~ s/name="//g;
+	$func_annot =~ s/" //g;
+
+	my $genome = $cols[$index];
+	die "Unable to find genome in $line at index $index\n" if(!defined $genome);
+	$index++;	
+	$genome =~ s/genome=//;
+
+	my $analysis = $cols[$index];
+	$analysis =~ s/analysisRun=//;
+	return ($transcript_id, $gene_id, $locus_name, $func_annot, $genome, $analysis);
 }
 
 1;
