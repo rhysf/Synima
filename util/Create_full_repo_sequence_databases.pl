@@ -152,31 +152,33 @@ sub make_broad_style_id_for_fasta {
 
 	# Name
 	my $name = "name=\"hypothetical protein\"";
-	if(defined $id_parts[3] =~ m/name\=\"/) { 
+	if(defined $id_parts[3]) {
+		if($id_parts[3] =~ m/name\=\"/) { 
 
-		# spaces in name
-		my $name;
-		my $remove_extra_name_elements_count = 0;
-		NAME_PARTS: for(my $j=3; $j <= scalar(@id_parts); $j++) {
-			$name .= " $id_parts[$j]";
-			#warn "j $j = $name\n";
-			# end of name?
-			if($id_parts[$j] =~ m/\"$/) {
-				#warn "j $j end of name\n";
+			# spaces in name
+			my $name;
+			my $remove_extra_name_elements_count = 0;
+			NAME_PARTS: for(my $j=3; $j <= scalar(@id_parts); $j++) {
+				$name .= " $id_parts[$j]";
+				#warn "j $j = $name\n";
+				# end of name?
+				if($id_parts[$j] =~ m/\"$/) {
+					#warn "j $j end of name\n";
+					if($j > 3) { $remove_extra_name_elements_count++; }
+					last NAME_PARTS;
+				}
+
+				# Remove extra id parts from id array (name should fill only 1 element)
 				if($j > 3) { $remove_extra_name_elements_count++; }
-				last NAME_PARTS;
 			}
 
-			# Remove extra id parts from id array (name should fill only 1 element)
-			if($j > 3) { $remove_extra_name_elements_count++; }
+			# remove name parts from rest of id array (name should fill only 1 element)
+			REMOVE_NAME_PARTS: for(my $k=0; $k<$remove_extra_name_elements_count; $k++) {
+				#warn "Remove $id_parts[4]\n";
+				splice @id_parts, 4, 1; 
+			}
+			$name = "$name"; 
 		}
-
-		# remove name parts from rest of id array (name should fill only 1 element)
-		REMOVE_NAME_PARTS: for(my $k=0; $k<$remove_extra_name_elements_count; $k++) {
-			#warn "Remove $id_parts[4]\n";
-			splice @id_parts, 4, 1; 
-		}
-		$name = "$name"; 
 	}
 
 	# Genome
