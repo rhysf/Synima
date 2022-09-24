@@ -42,7 +42,7 @@ sub combine_all_gff3_files_in_repo {
 	my %new_transcript_ids;
 
 	# Combine all GFFs
-	warn "Combine_all_gff3_files_in_repo: printing to $output\n";
+	warn "combine_all_gff3_files_in_repo: printing to $output\n";
 	die "$output already exists. Delete then re-run\n" if(-e $output);
 	open my $ofh, '>>', $output or die "Error, cannot open file $output\n";
 	foreach my $genome (@genomes) {
@@ -53,7 +53,7 @@ sub combine_all_gff3_files_in_repo {
 		my $change_id_count = 0;
 		my $duplicate_id_count = 0;
 		my $annot_gff3 = $data_manager->get_data_dump_filename($genome, "Annotation");
-		warn "Combine_all_gff3_files_in_repo: opening $annot_gff3\n";
+		warn "combine_all_gff3_files_in_repo: opening $annot_gff3\n";
 		die "Error, cannot find $annot_gff3" unless (-s $annot_gff3);
 		open my $fh, '<', $annot_gff3 or die "Error, cannot read $annot_gff3";
 		GFF: while (my $line=<$fh>) {
