@@ -36,7 +36,6 @@ sub make_all_vs_all_blast_search_cmds_from_repo {
 	my @genomes = $data_manager->get_genome_list();
 
 	# Make commands for all-vs-all-search
-	my @blast_cmds;
 	open my $blast_cmds_ofh, '>', $outfile or die "Error, cannot write to $outfile\n";
 	foreach my $genomeA (@genomes) {
 		my $genomeA_file = $data_manager->get_data_dump_filename($genomeA, $type);
@@ -61,7 +60,7 @@ sub make_all_vs_all_blast_search_cmds_from_repo {
 		}
 	}
 	close $blast_cmds_ofh;
-	return @blast_cmds;
+	return 1;
 }
 
 sub make_genome_blastable {

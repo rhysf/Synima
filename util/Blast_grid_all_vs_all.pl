@@ -46,8 +46,8 @@ foreach($Run_Commands_python) { die "Cannot find $_ : $!\n" unless(-e $_); }
 # Split FASTA seq dictionarys
 fastafile::split_fasta_seq_dictionary_by_species($opt_r, $opt_t);
 
-# Make commands for all-vs-all-search
-my @blast_cmds = blastfile::make_all_vs_all_blast_search_cmds_from_repo($opt_r, $opt_t, $opt_c, $opt_s, $opt_e, $opt_o);
+# blast index, make output directories (e.g. RBH_blast_PEP) and write Blast command (e.g. blast.PEP.cmds)
+blastfile::make_all_vs_all_blast_search_cmds_from_repo($opt_r, $opt_t, $opt_c, $opt_s, $opt_e, $opt_o);
 
 # Run commands on grid
 if(($opt_g =~ m/y/i) && (-s $opt_o)) {
