@@ -228,3 +228,15 @@ Notes:      Config.txt will be made automatically if not present, and read autom
 	    Default genome labels will be as they appear in aligncoords
 	    Order of genomes must have names as they appear in aligncoords
 	    Aligncoords.spans and Gene ID files will be highlighted according to the config
+
+
+perl Ortholog_dist_per_genome_summary.pl 
+Parameters: -r [cluster_dist_per_genome.txt]
+Optional: -c	clusters_and_unique.wAnnots
+          -l	Seperate file with info to join []
+	  -d	If opt_l, then from which column do i look for id? [0]
+          -p	Printing options (n=none, c=look up names in opt_c and print those lines, l=get gene names from opt_c, then look up in opt_l and print those lines) [n]
+	  -z	If opt_p = c, then restrict to 1 description - E.g. missing_in_Fo5176_454 []
+
+Notes: Output files go to -c (wAnnots) directory. Specifically, this script divides orthogroups into categories of interest, including single-copy orthologs, which can
+be used to construct phylogenetic trees, or genes that are not found in 1+ genome assemblies.
