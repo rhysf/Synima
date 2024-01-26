@@ -1,5 +1,6 @@
 
-![Synima](https://github.com/rhysf/Synima/blob/main/resources/logo.jpg?raw=true)
+![Synima](https://github.com/rhysf/Synima/blob/master/resources/logo.jpg?raw=true)
+          
 
 ## Introduction
 
@@ -30,8 +31,8 @@ For issues, questions, comments or feature requests, please check or post to the
 
 * Download software and run example Synima plot
 
-``git clone git@github.com:rhysf/Synima.git  
-cd Synima/examples  
+``git clone git@github.com:rhysf/Synima.git<br/>
+cd Synima/examples<br/>
 perl ../SynIma.pl -a Repo_spec.txt.dagchainer.aligncoords \  
              -b Repo_spec.txt.dagchainer.aligncoords.spans``
 
