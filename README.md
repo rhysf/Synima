@@ -1,6 +1,5 @@
 
-![Synima](https://github.com/rhysf/Synima/blob/master/resources/logo.jpg?raw=true)
-<img src="https://github.com/rhysf/Synima/blob/master/resources/logo.jpg?raw=true" width="200" height="200" />
+<img src="https://github.com/rhysf/Synima/blob/master/resources/logo.jpg?raw=true" width="400" height="400" />
 
 
 ## Introduction
@@ -33,14 +32,19 @@ For issues, questions, comments or feature requests, please check or post to the
 * Download software and run example Synima plot
 
 ``git clone git@github.com:rhysf/Synima.git``
+
 ``cd Synima/examples``
+
 ``perl ../SynIma.pl -a Repo_spec.txt.dagchainer.aligncoords -b Repo_spec.txt.dagchainer.aligncoords.spans``
 
 * Download software, run orthology pipeline and generate Synima plot
 
 ``git clone https://github.com/rhysf/Synima.git  
+
 cd Synima/examples  
+
 perl ../util/Create_full_repo_sequence_databases.pl -r ./Repo_spec.txt
+
 perl ../util/Blast_grid_all_vs_all.pl -r ./Repo_spec.txt
 perl ../util/Blast_all_vs_all_repo_to_OrthoMCL.pl -r ./Repo_spec.txt
 ALTERNATIVELY 1: ../util/Blast_all_vs_all_repo_to_RBH.pl -r ./Repo_spec.txt
