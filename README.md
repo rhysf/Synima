@@ -39,13 +39,13 @@ For issues, questions, comments or feature requests, please check or post to the
 
     git clone https://github.com/rhysf/Synima.git  
     cd Synima/examples  
-    perl ../util/Create_full_repo_sequence_databases.pl -r ./Repo_spec.txt
-    perl ../util/Blast_grid_all_vs_all.pl -r ./Repo_spec.txt
-    perl ../util/Blast_all_vs_all_repo_to_OrthoMCL.pl -r ./Repo_spec.txt
-    ALTERNATIVELY 1: ../util/Blast_all_vs_all_repo_to_RBH.pl -r ./Repo_spec.txt
-    ALTERNATIVELY 2: ../util/Blast_all_vs_all_repo_to_Orthofinder.pl -r ./Repo_spec.txt
-    perl ../util/Orthologs_to_summary.pl -o all_orthomcl.out
-    perl ../util/DAGchainer_from_gene_clusters.pl -r ./Repo_spec.txt -c GENE_CLUSTERS_SUMMARIES.OMCL/GENE_CLUSTERS_SUMMARIES.clusters
+    perl ../util/Create_full_repo_sequence_databases.pl -r ./Repo_spec.txt  
+    perl ../util/Blast_grid_all_vs_all.pl -r ./Repo_spec.txt  
+    perl ../util/Blast_all_vs_all_repo_to_OrthoMCL.pl -r ./Repo_spec.txt  
+    ALTERNATIVELY 1: ../util/Blast_all_vs_all_repo_to_RBH.pl -r ./Repo_spec.txt  
+    ALTERNATIVELY 2: ../util/Blast_all_vs_all_repo_to_Orthofinder.pl -r ./Repo_spec.txt  
+    perl ../util/Orthologs_to_summary.pl -o all_orthomcl.out  
+    perl ../util/DAGchainer_from_gene_clusters.pl -r ./Repo_spec.txt -c GENE_CLUSTERS_SUMMARIES.OMCL/GENE_CLUSTERS_SUMMARIES.clusters  
     perl ../SynIma.pl -a Repo_spec.txt.dagchainer.aligncoords -b Repo_spec.txt.dagchainer.aligncoords.spans``
 
 ## Description of the pipeline (Creating a sequence database)
