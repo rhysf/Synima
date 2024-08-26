@@ -144,8 +144,8 @@ sub write_gcoded_m8_and_sort {
 		chomp $line;
 		my @x = split /\t/, $line;
 		my ($accA, $accB) = @x;
-		my $genomeA = $$trans_id_to_genome{$accA} or die "Error, no genome for $accA saved from all_annotations.gff3 (check settings and rerun): $!\n";
-		my $genomeB = $$trans_id_to_genome{$accB} or die "Error, no genome for $accB saved from all_annotations.gff3 (check settings and rerun): $!\n";
+		my $genomeA = $$trans_id_to_genome{$accA} or die "Error, no genome for $accA saved from $blast_hits (check settings and rerun): $line: $!\n";
+		my $genomeB = $$trans_id_to_genome{$accB} or die "Error, no genome for $accB saved from $blast_hits (check settings and rerun): $line: $!\n";
 		my $codeA = $$genome_to_code{$genomeA};
 		my $codeB = $$genome_to_code{$genomeB};
 		$x[0] = "$codeA|$accA";

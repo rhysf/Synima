@@ -16,6 +16,7 @@ Optional: -t Type of alignment (PEP/CDS) [PEP]
           -c Number of best matches to capture between species [5] # only single best hit
           -s Number of top hits to capture in self-searches for paralogs [1000]  
           -e E-value cutoff [1e-20]
+          -h Number of threads [1]
           -o Blast cmds outfile [blast.\$type.cmds]
           -g Run commands on the grid (y/n) [n]
           -p Platform (UGER, LSF, GridEngine) [UGER]
@@ -23,15 +24,16 @@ Optional: -t Type of alignment (PEP/CDS) [PEP]
 Note: Blast needs to be in PATH. 
       If BLAST+ (formatdb and blastn/p) is in PATH, that will be used. 
       Otherwise, BLAST legacy (formatdb and blastall) needs to be in PATH.\n";
-our($opt_r, $opt_t, $opt_c, $opt_s, $opt_e, $opt_o, $opt_g, $opt_p, $opt_q);
-getopt('rtcseogpq');
+our($opt_c, $opt_e, $opt_g, $opt_h, $opt_o, $opt_p, $opt_q, $opt_r, $opt_s, $opt_t);
+getopt('ceghopqrst');
 die $usage unless($opt_r);
-if(!defined $opt_t) { $opt_t = 'PEP'; }
 if(!defined $opt_c) { $opt_c = 5; }
-if(!defined $opt_s) { $opt_s = 1000; }
 if(!defined $opt_e) { $opt_e = "1e-20"; }
-if(!defined $opt_o) { $opt_o = "blast.$opt_t.cmds"; }
 if(!defined $opt_g) { $opt_g = 'n'; }
+if(!defined $opt_h) { $opt_h = 1; }
+if(!defined $opt_t) { $opt_t = 'PEP'; }
+if(!defined $opt_s) { $opt_s = 1000; }
+if(!defined $opt_o) { $opt_o = "blast.$opt_t.cmds"; }
 if(!defined $opt_p) { $opt_p = 'UGER'; }
 if(!defined $opt_q) { $opt_q = 'short'; }
 die "Cannot open $opt_r : $!\n" unless(-e $opt_r);
@@ -47,7 +49,7 @@ foreach($Run_Commands_python) { die "Cannot find $_ : $!\n" unless(-e $_); }
 fastafile::split_fasta_seq_dictionary_by_species($opt_r, $opt_t);
 
 # blast index, make output directories (e.g. RBH_blast_PEP) and write Blast command (e.g. blast.PEP.cmds)
-blastfile::make_all_vs_all_blast_search_cmds_from_repo($opt_r, $opt_t, $opt_c, $opt_s, $opt_e, $opt_o);
+blastfile::make_all_vs_all_blast_search_cmds_from_repo($opt_r, $opt_t, $opt_c, $opt_s, $opt_h, $opt_e, $opt_o);
 
 # Run commands on grid
 if(($opt_g =~ m/y/i) && (-s $opt_o)) {
