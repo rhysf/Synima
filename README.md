@@ -1,6 +1,6 @@
-
+<p align="center">
 <img src="https://github.com/rhysf/Synima/blob/master/resources/logo2.png?raw=true" width="400" height="400" />
-
+</p>
 
 ## Introduction
 
@@ -47,6 +47,17 @@ For issues, questions, comments or feature requests, please check or post to the
     perl ../util/Orthologs_to_summary.pl -o all_orthomcl.out  
     perl ../util/DAGchainer_from_gene_clusters.pl -r ./Repo_spec.txt -c GENE_CLUSTERS_SUMMARIES.OMCL/GENE_CLUSTERS_SUMMARIES.clusters  
     perl ../SynIma.pl -a Repo_spec.txt.dagchainer.aligncoords -b Repo_spec.txt.dagchainer.aligncoords.spans``
+
+## Updates
+
+- **30/10/2025** – New functionality: FASTA files can now be generated from ortholog clusters for species tree inference. This feature requires **MUSCLE v5** and should be run after OrthoMCL, RBH, or OrthoFinder.
+
+```bash
+Ortholog_clusters_to_multiple_align_muscle.pl -r Repo_spec.txt -c gene_clusters 
+Single_copy_ortholog_repo_and_malign_to_tree.pl -r Repo_spec.txt -g gene_clusters
+```
+
+These scripts require 
 
 ## Description of the pipeline (Creating a sequence database)
 
