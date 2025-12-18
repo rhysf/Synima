@@ -2,6 +2,11 @@
 <img src="https://github.com/rhysf/Synima/blob/master/resources/logo2.png?raw=true" width="200" height="200" />
 </p>
 
+## Update
+
+* Synima 2 has now been released at <a href="https://github.com/rhysf/Synima2">https://github.com/rhysf/Synima2</a>, which includes major code revisions and graphical updates. 
+* Synima 1 will no longer be maintained or updated.
+
 ## Introduction
 
 Synima (Synteny Imager) is an orthology prediction pipeline and synteny viewer. The key features are:

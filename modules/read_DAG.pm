@@ -39,8 +39,8 @@ sub save_aligncoords {
 			}
 
 			# Genomes and gene name
-			my @gen1 = split /\:/, $genome1_gene_name;
-			my @gen2 = split /\:/, $genome2_gene_name;
+			my @gen1 = split /\|/, $genome1_gene_name;
+			my @gen2 = split /\|/, $genome2_gene_name;
 			die "Error: Unexpected aligncoords format for genome and gene name (1) separated by ; ($genome1_gene_name) on line $lines[$i]\n" if(!defined $gen1[1]);
 			die "Error: Unexpected aligncoords format for genome and gene name (2) separated by ; ($genome2_gene_name) on line $lines[$i]\n" if(!defined $gen2[1]);
 
